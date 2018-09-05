@@ -1,0 +1,32 @@
+//预处理O(n),单次询问O(sqrt(n))
+int mu[N],prime[N],sum[N];
+bool mark[N];
+int cnt;
+void init()
+{
+    mu[1]=1;
+    cnt=0;
+    for(int i=2;i<N;i++)
+    {
+        if(!mark[i])prime[++cnt]=i,mu[i]=-1;
+        for(int j=1;j<=cnt;j++)
+        {
+            int t=i*prime[j];
+            if(t>N)break;
+            mark[t]=1;
+            if(i%prime[j]==0){mu[t]=0;break;}
+            else mu[t]=-mu[i];
+        }
+    }
+    for(int i=1;i<N;i++)sum[i]=sum[i-1]+mu[i];
+}
+ll cal(int n,int m)
+{
+    ll ans=0;
+    for(int i=1,last;i<=min(n,m);i=last+1)
+    {
+        last=min(n/(n/i),m/(m/i));
+        ans+=(ll)(sum[last]-sum[i-1])*(n/i)*(m/i);
+    }
+    return ans;
+}
