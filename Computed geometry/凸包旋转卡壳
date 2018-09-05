@@ -1,0 +1,61 @@
+//求凸包O(nlogn)
+struct point{
+    ll x,y;
+};
+point p[N],s[N];
+int top,n;
+ll dir(point p1,point p2,point p3)
+{
+    return (p3.x-p2.x)*(p2.y-p1.y)-(p3.y-p2.y)*(p2.x-p1.x);
+}
+ll dis(point a,point b)
+{
+    return (a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y);
+}
+ll area(point p1,point p2,point p3)
+{
+    return fabs(dir(p1,p2,p3));
+}
+bool cmp(point a,point b)
+{
+    ll te=dir(p[0],a,b);
+    if(te<0)return 1;
+    if(te==0&&dis(p[0],a)<dis(p[0],b))return 1;
+    return 0;
+}
+void graham()
+{
+    int pos,minx,miny;
+    minx=miny=inf;
+    for(int i=0;i<n;i++)
+    {
+        if(p[i].x<minx||(p[i].x==minx&&p[i].y<miny))
+        {
+            minx=p[i].x;
+            miny=p[i].y;
+            pos=i;
+        }
+    }
+    swap(p[0],p[pos]);
+    sort(p+1,p+n,cmp);
+    p[n]=p[0];
+    s[0]=p[0],s[1]=p[1],s[2]=p[2];
+    top=2;
+    for(int i=3;i<=n;i++)
+    {
+        while(dir(s[top-1],s[top],p[i])>=0&&top>=2)top--;
+        s[++top]=p[i];
+    }
+    ll ans=0;
+    for(int i=0;i<top;i++)//旋转卡壳求最大四边形面积O(n^2)
+    {
+        int j,a1=(i+1)%top,a2=(i+3)%top;
+        for(j=(i+2)%top;j!=i;j=(j+1)%top)
+        {
+            while(a1!=j&&area(s[(a1+1)%top],s[i],s[j])>=area(s[a1],s[i],s[j]))a1=(a1+1)%top;
+            while(a2!=i&&area(s[(a2+1)%top],s[i],s[j])>=area(s[a2],s[i],s[j]))a2=(a2+1)%top;
+            ans=max(ans,area(s[a1],s[i],s[j])+area(s[a2],s[i],s[j]));
+        }
+    }
+    printf("%.3f\n",1.0*ans/2);
+}
