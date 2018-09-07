@@ -1,0 +1,59 @@
+//cnt数组表示该节点代表的回文串出现次数，add时如果要新建节点，则说明出现了本质不同的子串
+struct PAM{
+    int ch[N][10],fail[N],cnt[N],num[N],len[N],s[N],le[N];
+    ll val[N],ans[N];
+    int last,n,p;
+    int newnode(int w,int c)
+    {
+        for(int i=0;i<10;i++)ch[p][i] = 0;
+        cnt[p] = num[p] = 0;
+        len[p] = w;val[p]=c;
+        return p++;
+    }
+    void init()
+    {
+        p = last = n = 0;
+        newnode(0,0);
+        newnode(-1,0);
+        s[n] = -1;
+        fail[0] = 1;
+    }
+    int getfail(int x)
+    {
+        while(s[n-len[x]-1] != s[n]) x = fail[x];
+        return x;
+    }
+    void add(int c)
+    {
+        s[++n] = c;
+        int cur = getfail(last);
+        if(!ch[cur][c]){
+            int now = newnode(len[cur]+2,c);
+            fail[now] = ch[getfail(fail[cur])][c];
+            ch[cur][c] = now;
+            num[now] = num[fail[now]] + 1;
+        }
+        last = ch[cur][c];
+        cnt[last]++;
+    }
+    void cal()//求本质不同的回文串和
+    {
+        ll pp=0;
+        for(int i=0;i<p;i++)
+        {
+            for(int j=0;j<10;j++)if(ch[i][j])
+            {
+                if(ans[i])ans[ch[i][j]]=(ans[i]*10%mod+val[ch[i][j]]+qp(10,1+le[i])*val[ch[i][j]]%mod)%mod,
+                    le[ch[i][j]]=le[i]+2;
+                else
+                {
+                    if(len[i]&1)ans[ch[i][j]]=val[ch[i][j]],le[ch[i][j]]=1;
+                    else ans[ch[i][j]]=(val[ch[i][j]]+val[ch[i][j]]*10%mod)%mod,le[ch[i][j]]=2;
+                }
+            }
+            pp+=ans[i];if(pp>=mod)pp-=mod;
+        }
+        printf("%lld\n",pp);
+    }
+}pam;
+char s[N];
