@@ -1,0 +1,150 @@
+//假设p->fail=q,那么root到q一定是root到p的子串
+//fail是当前前缀的在ac自动机里的最长后缀
+char s[N*2];
+struct ACM{
+    int root,tot;
+    int Next[N][26],fail[N*26],End[N*26];
+    int newnode()
+    {
+        memset(Next[tot],-1,sizeof Next[tot]);
+        End[tot]=0;
+        return tot++;
+    }
+    void init()
+    {
+        tot=0;
+        root=newnode();
+    }
+    void ins()
+    {
+        int now=root,n=strlen(s);
+        for(int i=0;i<n;i++)
+        {
+            if(Next[now][s[i]-'a']==-1)
+                Next[now][s[i]-'a']=newnode();
+            now=Next[now][s[i]-'a'];
+        }
+        End[now]++;
+    }
+    void build()
+    {
+//        int qq[N],cnt=0;//fail树的dfs序
+        queue<int>q;
+        fail[root]=root;
+        for(int i=0;i<26;i++)
+        {
+            if(Next[root][i]==-1)Next[root][i]=root;
+            else
+            {
+                fail[Next[root][i]]=root;
+                q.push(Next[root][i]);
+//                qq[++cnt]=Next[root][i];
+            }
+        }
+        while(!q.empty())
+        {
+            int now=q.front();
+            q.pop();
+            for(int i=0;i<26;i++)
+            {
+                if(Next[now][i]==-1)Next[now][i]=Next[fail[now]][i];
+                else
+                {
+                    fail[Next[now][i]]=Next[fail[now]][i];
+                    q.push(Next[now][i]);
+//                    qq[++cnt]=Next[now][i];
+                }
+            }
+        }
+//        for(;cnt;cnt--)sum[fail[qq[cnt]]]+=sum[qq[cnt]];
+    }
+    int query()
+    {
+        int now=root,n=strlen(s),ans=0;
+        for(int i=0;i<n;i++)
+        {
+            now=Next[now][s[i]-'a'];
+            int te=now;
+            while(te!=root)
+            {
+                ans+=End[te];
+                End[te]=0;
+                te=fail[te];
+            }
+        }
+        return ans;
+    }
+}ac;
+
+//利用二进制分组的ac自动机合并
+struct Trie {
+    int ch[N][26],fail[N],en[N],en1[N],cnt;
+    int num[30],root[30],top;
+    void getfail(int x)
+    {
+        queue<int>q;
+        q.push(x);
+        while(!q.empty())
+        {
+            int te=q.front();q.pop();
+            for(int i=0;i<26;i++)
+            {
+                if(ch[te][i])
+                {
+                    int u=fail[te],u1=ch[te][i];
+                    while(u&&!ch[u][i])u=fail[u];
+                    fail[u1]=u ? ch[u][i]:x;
+                    q.push(u1);
+                    en1[u1]=en1[fail[u1]]+en[u1];
+                }
+            }
+        }
+    }
+    int Merge(int x,int y)
+    {
+        if(!x||!y)return x+y;
+        en[x]=en[x]|en[y];
+        for(int i=0;i<26;i++)
+            ch[x][i]=Merge(ch[x][i],ch[y][i]);
+        return x;
+    }
+    void Insert(char *s)
+    {
+        int len=strlen(s);
+        root[++top]=++cnt;
+        int now=root[top];
+        for(int i=0;i<len;i++)
+        {
+            if(!ch[now][s[i]-'a'])
+                ch[now][s[i]-'a']=++cnt;
+            now=ch[now][s[i]-'a'];
+        }
+        en[now]=1;num[top]=1;
+        getfail(root[top]);
+        while(top&&num[top]==num[top-1])
+        {
+            Merge(root[top-1],root[top]);
+            getfail(root[top-1]);
+            num[top-1]+=num[top];
+            top--;
+        }
+    }
+    int query(char *s)
+    {
+        int len=strlen(s),ans=0;
+        for(int i=1;i<=top;i++)
+        {
+            int now=root[i];
+            for(int j=0;j<len;j++)
+            {
+                while(now&&!ch[now][s[j]-'a'])now=fail[now];
+                if(now)now=ch[now][s[j]-'a'];
+                else now=root[i];
+                ans+=en1[now];
+            }
+        }
+        return ans;
+    }
+}acm1,acm2;
+char s[N];
+//带删除的ac自动机，建两颗ac自动机即可，一颗表示删除
