@@ -1,0 +1,39 @@
+//O(nlogn)线段树合并
+int root[N],ma[N*22],ind[N*22];
+int ls[N*22],rs[N*22],tot;
+inline void pushup(int o)
+{
+    if(ma[ls[o]]>=ma[rs[o]])ma[o]=ma[ls[o]],ind[o]=ind[ls[o]];
+    else ma[o]=ma[rs[o]],ind[o]=ind[rs[o]];
+}
+inline int Merge(int x,int y,int l,int r)
+{
+    if(l==r)
+    {
+        if(!x||!y)
+        {
+            ma[x+y]=ma[x]+ma[y];
+            return x+y;
+        }
+        else
+        {
+            ma[x]=ma[x]+ma[y];
+            return x;
+        }
+    }
+    if(!x||!y)return x+y;
+    int m=(l+r)>>1;
+    ls[x]=Merge(ls[x],ls[y],l,m);
+    rs[x]=Merge(rs[x],rs[y],m+1,r);
+    pushup(x);
+    return x;
+}
+void update(int &o,int pos,int l,int r)
+{
+    if(!o)o=++tot;
+    if(l==r){ma[o]++;ind[o]=l;return ;}
+    int m=(l+r)>>1;
+    if(pos<=m)update(ls[o],pos,l,m);
+    else update(rs[o],pos,m+1,r);
+    pushup(o);
+}
