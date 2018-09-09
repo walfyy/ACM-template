@@ -65,3 +65,4 @@ void cdq(int l,int r)//分治fft
     }
     cdq(m+1,r);
 }
+//分治fft求dp[n]=Σdp[i]*a[n-i]+a[n]
