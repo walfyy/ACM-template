@@ -1,0 +1,67 @@
+//O(nlogn)
+struct cd{
+    db x,y;
+    cd(db _x=0.0,db _y=0.0):x(_x),y(_y){}
+    cd operator +(const cd &b)const{
+        return cd(x+b.x,y+b.y);
+    }
+    cd operator -(const cd &b)const{
+        return cd(x-b.x,y-b.y);
+    }
+    cd operator *(const cd &b)const{
+        return cd(x*b.x - y*b.y,x*b.y + y*b.x);
+    }
+    cd operator /(const db &b)const{
+        return cd(x/b,y/b);
+    }
+}a[N<<3],b[N<<3];
+int rev[N<<3];
+void getrev(int bit)
+{
+    for(int i=0;i<(1<<bit);i++)
+        rev[i]=(rev[i>>1]>>1) | ((i&1)<<(bit-1));
+}
+void fft(cd *a,int n,int dft)
+{
+    for(int i=0;i<n;i++)
+        if(i<rev[i])
+            swap(a[i],a[rev[i]]);
+    for(int step=1;step<n;step<<=1)
+    {
+        cd wn(cos(dft*pi/step),sin(dft*pi/step));
+        for(int j=0;j<n;j+=step<<1)
+        {
+            cd wnk(1,0);
+            for(int k=j;k<j+step;k++)
+            {
+                cd x=a[k];
+                cd y=wnk*a[k+step];
+                a[k]=x+y;a[k+step]=x-y;
+                wnk=wnk*wn;
+            }
+        }
+    }
+    if(dft==-1)for(int i=0;i<n;i++)a[i]=a[i]/n;
+}
+int dp[N],a[N];
+void cdq(int l,int r)//分治fft
+{
+    if(l==r)return ;
+    int m=(l+r)>>1;
+    cdq(l,m);
+    int sz=0;
+    while((1<<sz)<=(r-l+1))sz++;sz++;
+    getrev(sz);int len=(1<<sz);
+    for(int i=0;i<=len;i++)x[i]=y[i]=cd(0,0);
+    for(int i=l;i<=m;i++)x[i-l]=cd(dp[i],0);
+    for(int i=1;i<=r-l;i++)y[i-1]=cd(a[i],0);
+    fft(x,len,1),fft(y,len,1);
+    for(int i=0;i<=len;i++)x[i]=x[i]*y[i];
+    fft(x,len,-1);
+    for(int i=m+1;i<=r;i++)
+    {
+        dp[i]+=(x[i-l-1].x+0.5);
+        dp[i]%=313;
+    }
+    cdq(m+1,r);
+}
