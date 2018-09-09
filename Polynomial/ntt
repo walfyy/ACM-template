@@ -1,0 +1,137 @@
+#define mod 998244353
+ll x[N<<3],y[N<<3];
+int rev[N<<3];
+void getrev(int bit)
+{
+    for(int i=0;i<(1<<bit);i++)
+        rev[i]=(rev[i>>1]>>1) | ((i&1)<<(bit-1));
+}
+void ntt(ll *a,int n,int dft)
+{
+    for(int i=0;i<n;i++)
+        if(i<rev[i])
+            swap(a[i],a[rev[i]]);
+    for(int step=1;step<n;step<<=1)
+    {
+        ll wn=qp(3,(mod-1)/(step*2));
+        if(dft==-1)wn=qp(wn,mod-2);
+        for(int j=0;j<n;j+=step<<1)
+        {
+            ll wnk=1;
+            for(int k=j;k<j+step;k++)
+            {
+                ll x=a[k];
+                ll y=wnk*a[k+step]%mod;
+                a[k]=(x+y)%mod;a[k+step]=(x-y+mod)%mod;
+                wnk=wnk*wn%mod;
+            }
+        }
+    }
+    if(dft==-1)
+    {
+        ll inv=qp(n,mod-2);
+        for(int i=0;i<n;i++)a[i]=a[i]*inv%mod;
+    }
+}
+ll dp[N],a[N];
+void cdq(int l,int r)//分治ntt
+{
+    if(l==r)return ;
+    int m=(l+r)>>1;
+    cdq(l,m);
+    int sz=0;
+    while((1<<sz)<=(r-l+1))sz++;sz++;
+    getrev(sz);int len=(1<<sz);
+    for(int i=0;i<=len;i++)x[i]=y[i]=0;
+    for(int i=l;i<=m;i++)x[i-l]=dp[i];
+    for(int i=1;i<=r-l;i++)y[i-1]=a[i];
+    ntt(x,len,1),ntt(y,len,1);
+    for(int i=0;i<=len;i++)x[i]=x[i]*y[i]%mod;
+    ntt(x,len,-1);
+    for(int i=m+1;i<=r;i++)
+    {
+        dp[i]+=x[i-l-1]%mod;
+        dp[i]%=mod;
+    }
+    cdq(m+1,r);
+}
+1.定义:设m>1,(a,m)==1,满足$a^r=1(modm)$的最小r是$\phi(r)$,那么a就是m的原根
+2.性质:如果g是p原根,那么$g^1,g^2...g^(p-1)$是1到p-1的排列,各不相同
+对于$g^k=x(mod p)$,我们记I(x)=k,
+有$I(a*b)=I(a)*I(b)(mod p-1),I(a^k)=kI(a)(mod p-1)$
+3.求法:求原根的话就是找到一个g,对于$p-1=p_1^{k_1}*p_2^{k_2}***p_x^{k_x}$,都有$g^{\frac{p-1}{p_i}}!=1(1<=i<=k)$
+直接遍历即可,因为原根不是很大
+//求原根
+    ll n,p;scanf("%lld",&n);
+    vi v;p=n-1;
+    for(ll i=2;i*i<=p;i++)
+    {
+        if(p%i==0)
+        {
+            v.pb(i);
+            while(p%i==0)p/=i;
+        }
+    }
+    if(p!=1)v.pb(p);
+    for(int i=1;i<=n;i++)
+    {
+        bool ok=1;
+        for(int j=0;j<v.size();j++)
+            if(qp(i,(n-1)/v[j],n)==1)
+                ok=0;
+        if(ok)return 0*printf("%d\n",i);
+    }
+   
+ll a[N<<3],b[N<<3],c[N<<3],d[N<<3],e[N<<3],tmp[N<<3];
+void pol_inv(int deg,ll *a,ll *b)//多项式求逆
+{
+    if(deg==1){b[0]=qp(a[0],mod-2);return ;}
+    pol_inv((deg+1)>>1,a,b);
+    int sz=0;while((1<<sz)<=deg)sz++;sz++;
+    getrev(sz);int len=1<<sz;
+    for(int i=0;i<deg;i++)tmp[i]=a[i];
+    for(int i=deg;i<len;i++)tmp[i]=0;
+    ntt(tmp,len,1),ntt(b,len,1);
+    for(int i=0;i<len;i++)
+        b[i]=(2ll-tmp[i]*b[i]%mod+mod)%mod*b[i]%mod;
+    ntt(b,len,-1);
+    for(int i=deg;i<len;i++)b[i]=0;
+}
+void pol_div(int n,int m,ll *a,ll *b,ll *c,ll *d)//多项式除法
+{
+    for(int i=0;i<=n-m;i++)if(m>=i)c[i]=b[m-i];
+    int sz=0;while((1<<sz)<=MAX(n-m+1,m))sz++;sz++;
+    int len=1<<sz;
+    pol_inv(len,c,d);
+    for(int i=0;i<=n-m;i++)c[i]=a[n-i];
+    for(int i=n-m+1;i<len;i++)c[i]=d[i]=0;
+    getrev(sz);
+    ntt(c,len,1);ntt(d,len,1);
+    for(int i=0;i<len;i++)c[i]=c[i]*d[i]%mod;
+    ntt(c,len,-1);
+    reverse(c,c+n-m+1);
+    for(int i=n-m+1;i<len;i++)c[i]=0;
+    sz=0;while((1<<sz)<=n+1)sz++;sz++;
+    len=1<<sz;getrev(sz);
+    ntt(c,len,1);ntt(b,len,1);
+    for(int i=0;i<len;i++)d[i]=c[i]*b[i]%mod;
+    ntt(d,len,-1);ntt(c,len,-1);
+    for(int i=0;i<len;i++)d[i]=(a[i]-d[i]+mod)%mod;
+    for(int i=m;i<len;i++)d[i]=0;
+}
+void pol_sqrt(int deg,ll *a,ll *b)//多项式开根
+{
+    if(deg==1){b[0]=1;return ;}
+    pol_sqrt((deg+1)>>1,a,b);
+    int sz=0;while((1<<sz)<=deg)sz++;
+    getrev(sz);int len=1<<sz;
+    for(int i=0;i<len;i++)d[i]=0;
+    pol_inv(deg,b,d);
+    for(int i=0;i<deg;i++)tmp[i]=a[i];
+    for(int i=deg;i<len;i++)tmp[i]=0;
+    ntt(tmp,len,1),ntt(b,len,1),ntt(d,len,1);
+    for(int i=0;i<len;i++)
+        b[i]=(tmp[i]*d[i]%mod+b[i])%mod*inv2%mod;
+    ntt(b,len,-1);
+    for(int i=deg;i<len;i++)b[i]=0;
+}
