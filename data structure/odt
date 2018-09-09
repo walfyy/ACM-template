@@ -1,0 +1,72 @@
+//保证推平操作足够多的时候可用，即一段区间赋值
+//明显特征是数据随机
+struct ODT{
+    struct node{
+        int l,r;mutable ll val;
+        bool operator <(const node&rhs)const{
+            return l<rhs.l || l==rhs.l&&r<rhs.r;
+        }
+    };
+    set<node>s;
+    void split(int pos)
+    {
+        if(pos<=0)return ;
+        auto p=s.upper_bound(node{pos,inf,INF});
+        if(p==s.begin())return ;
+        p--;
+//        printf("--------%d %d %d\n",p->l,p->r,p->val);
+        if(pos < p->l || pos >= p->r)return ;
+        node te=*p;
+        s.erase(te);
+        s.insert({te.l,pos,te.val});
+        s.insert({pos+1,te.r,te.val});
+    }
+    void add(int l,int r,ll v)//区间加
+    {
+        split(l-1),split(r);
+        auto x=s.lower_bound(node{l,-inf,-INF});
+        auto y=s.lower_bound(node{r,inf,INF});
+        for(;x!=y;x++)x->val += v;
+    }
+    void color(int l,int r,ll val)//区间赋值
+    {
+        split(l-1);split(r);
+        auto x=s.lower_bound(node{l,-inf,-INF});
+        auto y=s.lower_bound(node{r,inf,INF});
+//        printf("%d %d %d %d\n",x->l,x->r,y->l,y->r);
+        s.erase(x,y);
+        s.insert({l,r,val});
+    }
+    void kth(int l,int r,ll k)//区间第k小
+    {
+        split(l-1);split(r);
+        auto x=s.lower_bound(node{l,-inf,-INF});
+        auto y=s.lower_bound(node{r,inf,INF});
+        vector<pli>v;
+        for(;x!=y;x++)
+            v.pb(mp(x->val,x->r - x->l + 1));
+        sort(v.begin(),v.end(),[](pli a,pli b){return a.fi>b.fi;});
+        for(int i=(int)v.size()-1;i>=0;i--)
+        {
+            if(k<=v[i].se)
+            {
+                printf("%lld\n",v[i].fi);
+                return ;
+            }
+            k-=v[i].se;
+        }
+    }
+    void sum(int l,int r,ll a,ll b)区间x次方的和%y
+    {
+        split(l-1);split(r);
+        auto x=s.lower_bound(node{l,-inf,-INF});
+        auto y=s.lower_bound(node{r,inf,INF});
+        ll ans=0;
+        for(;x!=y;x++)
+        {
+            ans+=1ll*qp(x->val % b,a,1ll*b)*(x->r - x->l + 1)%b;
+            if(ans>=b)ans-=b;
+        }
+        printf("%lld\n",ans);
+    }
+}o;
