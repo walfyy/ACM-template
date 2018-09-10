@@ -1,0 +1,72 @@
+//O(nlogn)
+struct LCT{
+    int fa[N],ch[N][2],rev[N],sz[N],q[N],id[N],mi[N];
+    void init()
+    {
+        memset(ch,0,sizeof ch);
+        memset(fa,0,sizeof fa);
+        memset(sz,0,sizeof sz);
+        memset(rev,0,sizeof rev);
+    }
+    inline bool isroot(int x){return ch[fa[x]][0]!=x&&ch[fa[x]][1]!=x;}
+    inline void pushup(int x)
+    {
+        sz[x]=sz[ch[x][0]]+sz[ch[x][1]]+1;
+        mi[x]=ti[x];id[x]=x;
+        if(ch[x][0]&&mi[x]>mi[ch[x][0]])
+        {
+            mi[x]=mi[ch[x][0]];
+            id[x]=id[ch[x][0]];
+        }
+        if(ch[x][1]&&mi[x]>mi[ch[x][1]])
+        {
+            mi[x]=mi[ch[x][1]];
+            id[x]=id[ch[x][1]];
+        }
+    }
+    inline void pushdown(int x)
+    {
+        if(rev[x])
+        {
+            rev[x]=0;swap(ch[x][0],ch[x][1]);
+            rev[ch[x][0]]^=1,rev[ch[x][1]]^=1;
+        }
+    }
+    inline void Rotate(int x)
+    {
+        int y=fa[x],z=fa[y],l,r;
+        if(ch[y][0]==x)l=0,r=l^1;
+        else l=1,r=l^1;
+        if(!isroot(y))
+        {
+            if(ch[z][0]==y)ch[z][0]=x;
+            else ch[z][1]=x;
+        }
+        fa[x]=z;fa[y]=x;fa[ch[x][r]]=y;
+        ch[y][l]=ch[x][r];ch[x][r]=y;
+        pushup(y);
+    }
+    inline void splay(int x)
+    {
+        int top=1;q[top]=x;
+        for(int i=x;!isroot(i);i=fa[i])q[++top]=fa[i];
+        for(int i=top;i;i--)pushdown(q[i]);
+        while(!isroot(x))
+        {
+            int y=fa[x],z=fa[y];
+            if(!isroot(y))
+            {
+                if((ch[y][0]==x)^(ch[z][0]==y))Rotate(x);
+                else Rotate(y);
+            }
+            Rotate(x);
+        }
+        pushup(x);
+    }
+    inline void access(int x){for(int y=0;x;y=x,x=fa[x])splay(x),ch[x][1]=y,pushup(x);}
+    inline void makeroot(int x){access(x),splay(x),rev[x]^=1;}
+    inline int findroot(int x){access(x),splay(x);while(ch[x][0])x=ch[x][0];return x;}
+    inline void split(int x,int y){makeroot(x),access(y),splay(y);}
+    inline void cut(int x,int y){split(x,y);if(ch[y][0]==x)ch[y][0]=0,fa[x]=0;}
+    inline void link(int x,int y){makeroot(x),fa[x]=y,splay(x);}
+}lct;
