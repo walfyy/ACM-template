@@ -1,0 +1,44 @@
+//标记永久化
+int rt[N],tot,ls[N*30],rs[N*30];
+ll sum[N*30],add[N*30];
+void build(int &o,int l,int r)
+{
+    o=++tot;
+    add[o]=0;
+    if(l==r)
+    {
+        scanf("%lld",&sum[o]);
+        return ;
+    }
+    int m=(l+r)>>1;
+    build(ls[o],l,m);
+    build(rs[o],m+1,r);
+    sum[o]=sum[ls[o]]+sum[rs[o]];
+}
+void update(int &o,int l,int r,int last,int L,int R,int x)
+{
+    o=++tot;
+    ls[o]=ls[last];
+    rs[o]=rs[last];
+    sum[o]=sum[last];
+    add[o]=add[last];
+    if(L<=l&&r<=R)
+    {
+        add[o]+=x;
+        return ;
+    }
+    int m=(l+r)>>1;
+    if(L<=m)update(ls[o],l,m,ls[last],L,R,x);
+    if(m<R)update(rs[o],m+1,r,rs[last],L,R,x);
+    sum[o]=sum[ls[o]]+add[ls[o]]*(m-l+1)+sum[rs[o]]+add[rs[o]]*(r-m);
+}
+ll query(int o,ll ad,int l,int r,int L,int R)
+{
+    if(L<=l&&r<=R)
+        return (ad+add[o])*(r-l+1)+sum[o];
+    ll ans=0;
+    int m=(l+r)>>1;
+    if(L<=m)ans+=query(ls[o],ad+add[o],l,m,L,R);
+    if(m<R)ans+=query(rs[o],ad+add[o],m+1,r,L,R);
+    return ans;
+}
