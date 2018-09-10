@@ -1,0 +1,34 @@
+//O(m)
+stack<int>s;
+vector<int>v[N],ans[N];
+int dfn[N],low[N];
+int ins[N],inans[N];
+int num,ind;
+void tarjan(int u)
+{
+    ins[u]=2;
+    low[u]=dfn[u]=++ind;
+    s.push(u);
+    for(int i=0;i<v[u].size();i++)
+    {
+        int t=v[u][i];
+        if(dfn[t]==0)
+        {
+            tarjan(t);
+            low[u]=min(low[u],low[t]);
+        }
+        else if(ins[t]==2)low[u]=min(low[u],dfn[t]);
+    }
+    if(low[u]==dfn[u])
+    {
+        ++num;
+        while(!s.empty()){
+            int k=s.top();
+            s.pop();
+            ins[k]=1;
+            ans[num].push_back(k);
+            inans[k]=num;
+            if(k==u)break;
+        }
+    }
+}
