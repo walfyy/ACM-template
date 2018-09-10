@@ -1,0 +1,253 @@
+struct Splay{
+    struct Node{
+        Node* ch[2];
+        int v,sum,ma,le,ri;
+        int s,maxx;
+        int flip,lazy;
+        int cmp(int x)const{
+            int d = x - ch[0]->s;
+            if(d==1)return -1;
+            return d<=0 ? 0:1;
+        }
+        void maintain()
+        {
+            s = 1 + ch[0]->s + ch[1]->s;
+            maxx = max(max(ch[0]->maxx,ch[1]->maxx),v);//和最大的子列
+            sum = v + ch[0]->sum + ch[1]->sum;
+            le = max(ch[0]->le,ch[0]->sum+v+ch[1]->le);
+            if(ch[0]->le == ch[0]->sum)le = max(le, ch[0]->le + v + ch[1]->le);
+            ri = max(ch[1]->ri,ch[1]->sum+v+ch[0]->ri);
+            if(ch[1]->ri == ch[1]->sum)ri = max(ri, ch[0]->ri + v + ch[1]->ri);
+            ma = max(max(ch[0]->ma,ch[1]->ma),ch[0]->ri+ch[1]->le+v);
+        }
+        void pushdown()
+        {
+            if(flip)
+            {
+                flip=0;
+                swap(ch[0],ch[1]);
+                swap(ch[0]->le,ch[0]->ri);
+                swap(ch[1]->ri,ch[1]->le);
+                ch[0]->flip = !(ch[0]->flip);
+                ch[1]->flip = !(ch[1]->flip);
+            }
+            if(lazy!=inf)
+            {
+                if(ch[0]->s!=0)
+                {
+                    ch[0]->v=ch[0]->maxx=lazy;
+                    ch[0]->sum=lazy*ch[0]->s;
+                    ch[0]->ma=ch[0]->le=ch[0]->ri=max(0,ch[0]->sum);
+                }
+                if(ch[1]->s!=0)
+                {
+                    ch[1]->v=ch[1]->maxx=lazy;
+                    ch[1]->sum=lazy*ch[1]->s;
+                    ch[1]->ma=ch[1]->le=ch[1]->ri=max(0,ch[1]->sum);
+                }
+                ch[0]->lazy=ch[1]->lazy=lazy;
+                lazy=inf;
+            }
+        }
+    };
+    Node* null;
+    void Rotate(Node* &o,int d)
+    {
+        Node* k = o->ch[d^1];
+        o->ch[d^1] = k->ch[d];
+        k->ch[d] = o;
+        o->maintain();k->maintain();
+        o = k;
+    }
+    void splay(Node* &o,int k)
+    {
+        o->pushdown();
+        int d = o->cmp(k);
+        if(d==1)k -= o->ch[0]->s + 1;//利用二叉树性质
+        if(d!=-1)
+        {
+            Node* p = o->ch[d];
+            p->pushdown();
+            int d2 = p->cmp(k);
+            int k2 = (d2==0 ? k:k-p->ch[0]->s-1);
+            if(d2!=-1)
+            {
+                splay(p->ch[d2],k2);
+                if(d==d2)Rotate(o,d^1);
+                else Rotate(o->ch[d],d);
+            }
+            Rotate(o,d^1);
+        }
+    }
+    Node* Merge(Node* left,Node* right)
+    {
+        splay(left,left->s);//把排名最大的数splay到根
+        left->ch[1] = right;
+        left->maintain();
+        return left;
+    }
+    void split(Node* o,int k,Node* &left,Node* &right)
+    {
+        splay(o,k);//把排名为k的节点splay到根，右侧子树所有节点排名比k大，左侧小
+        right = o->ch[1];
+        o->ch[1] = null;
+        left = o;
+        left->maintain();
+    }
+    Node *root,*left,*right;
+    void init(int sz)
+    {
+        null=new Node;
+        null->s=null->sum=null->le=null->ri=0;
+        null->maxx=-inf;
+        root=new Node;
+        scanf("%d",&root->v);
+        root->flip=0;root->lazy=inf;
+        root->sum=root->maxx=root->v;
+        root->ma=root->ri=root->le=max(0,root->v);
+        root->ch[0]=root->ch[1]=null;
+        root->maintain();
+        Node* p;
+        for(int i=2;i<=sz;i++)
+        {
+            p=new Node;
+            scanf("%d",&p->v);
+            p->s=p->flip=0;
+            p->lazy=inf;
+            p->sum=p->maxx=p->v;
+            p->ma=p->le=p->ri=max(0,p->v);
+            p->ch[0]=root,p->ch[1]=null;
+            root=p;
+            root->maintain();
+        }
+    }
+    void ins(int pos,int x)//单点插入
+    {
+        Node *mid;mid=new Node();
+        mid->v=mid->sum=mid->maxx=x;
+        mid->flip=0,mid->lazy=inf;
+        mid->ma=mid->le=mid->ri=max(x,0);
+        mid->ch[0]=mid->ch[1]=null;
+        mid->maintain();
+        if(pos==0)root=Merge(mid,root);
+        else if(pos==root->s)root=Merge(root,mid);
+        else
+        {
+            split(root,pos,left,right);
+            root=Merge(left,Merge(mid,right));
+//            print(root);
+        }
+    }
+    void del(int l,int r)//区间删除
+    {
+        if(l==1&&r==root->s)dele(root),root=null;
+        else if(l==1&&r!=root->s)
+        {
+            split(root,r,left,right);
+            root=right;dele(left);
+        }
+        else if(l!=1&&r==root->s)
+        {
+            split(root,l-1,left,right);
+            root=left;dele(right);
+        }
+        else
+        {
+            split(root,r,left,right);
+            Node *mid;
+            split(left,l-1,left,mid);
+            root=Merge(left,right);
+            dele(mid);
+        }
+    }
+    void dele(Node *&o)
+    {
+        if(o->ch[0]!=null)dele(o->ch[0]);
+        if(o->ch[1]!=null)dele(o->ch[1]);
+        delete(o);
+    }
+    int change(int l,int r,int x,int op)//区间修改,翻转,求和
+    {
+        int ans=0;
+        if(l==1&&r==root->s)
+        {
+            if(op==1)
+            {
+                root->lazy=root->v=root->maxx=x;
+                root->sum=root->s*x;
+                if(x>0)root->ma=root->le=root->ri=root->sum;
+                else root->ma=root->le=root->ri=0;
+            }
+            else if(op==2)
+            {
+                swap(root->le,root->ri);
+                root->flip^=1;
+            }
+            else ans=root->sum;
+        }
+        else if(l==1&&r!=root->s)
+        {
+            split(root,r,left,right);
+            if(op==1)
+            {
+                left->lazy=left->v=left->maxx=x;
+                left->sum=left->s*x;
+                if(x>0)left->ma=left->le=left->ri=left->sum;
+                else left->ma=left->le=left->ri=0;
+            }
+            else if(op==2)
+            {
+                swap(left->le,left->ri);
+                left->flip^=1;
+            }
+            else ans=left->sum;
+            root=Merge(left,right);
+        }
+        else if(l!=1&&r==root->s)
+        {
+            split(root,l-1,left,right);
+            if(op==1)
+            {
+                right->lazy=right->v=right->maxx=x;
+                right->sum=right->s*x;
+                if(x>0)right->ma=right->le=right->ri=right->sum;
+                else right->ma=right->le=right->ri=0;
+            }
+            else if(op==2)
+            {
+                swap(right->le,right->ri);
+                right->flip^=1;
+            }
+            else ans=right->sum;
+            root=Merge(left,right);
+        }
+        else
+        {
+            split(root,r,left,right);
+            Node *mid;
+            split(left,l-1,left,mid);
+            if(op==1)
+            {
+                mid->lazy=mid->v=mid->maxx=x;
+                mid->sum=mid->s*x;
+                if(x>0)mid->ma=mid->le=mid->ri=mid->sum;
+                else mid->ma=mid->le=mid->ri=0;
+            }
+            else if(op==2)
+            {
+                swap(mid->le,mid->ri);
+                mid->flip^=1;
+            }
+            else ans=mid->sum;
+            root=Merge(left,Merge(mid,right));
+        }
+        return ans;
+    }
+    void print(Node *o)
+    {
+        o->pushdown();
+        printf("%d %d %d %d %d %d\n",o->ch[0]->v,o->v,o->ch[1]->v,o->ma,o->le,o->ri);
+        if(o->ch[0]!=null)print(o->ch[0]);
+        if(o->ch[1]!=null)print(o->ch[1]);
+    }
+}sp;
