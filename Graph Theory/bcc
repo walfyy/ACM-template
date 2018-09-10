@@ -1,0 +1,68 @@
+//边双,桥:删去后联通块增加
+vector<int>v[N];
+int dfn[N],low[N];
+int ind,num;
+map<int,int>ma[N];//为1表示桥
+void tarjan(int u,int f)
+{
+    low[u]=dfn[u]=++ind;
+    for(int i=0;i<v[u].size();i++)
+    {
+        int x=v[u][i];
+        if(x==f)continue;
+        if(!dfn[x])
+        {
+            tarjan(x,u);
+            low[u]=min(low[u],low[x]);
+            if(low[x]>dfn[u])ma[x][u]=ma[u][x]=1;
+        }
+        else low[u]=min(low[u],dfn[x]);
+    }
+}
+//点双,割顶:删去后联通块增加
+vector<pii>v[N];
+int dfn[N],low[N];
+int ind,iscut[N],n,m;
+vi ans;
+struct edge{int u,v,id;};
+stack<edge>s;
+int bcccnt,bccno[N];
+vi bcc[N],bb[N];//存bcc
+void tarjan(int u,int f)
+{
+    dfn[u]=low[u]=++ind;
+    int ch=0;
+    for(int i=0;i<v[u].size();i++)
+    {
+        int x=v[u][i].fi;
+        if(x==f)continue;
+        edge e={u,x,v[u][i].se};
+        if(!dfn[x])
+        {
+            s.push(e);
+            ch++;
+            tarjan(x,u);
+            low[u]=min(low[u],low[x]);
+            if(low[x]>=dfn[u])
+            {
+                iscut[u]=1;//割顶
+                bcccnt++;
+                bcc[bcccnt].clear();
+                while(1)
+                {
+                    edge now=s.top();s.pop();
+                    bb[bcccnt].pb(now.id);
+                    if(bccno[now.u]!=bcccnt){bcc[bcccnt].pb(now.u);bccno[now.u]=bcccnt;}
+                    if(bccno[now.v]!=bcccnt){bcc[bcccnt].pb(now.v);bccno[now.v]=bcccnt;}
+                    if(now.u==u&&now.v==x)break;
+                }
+            }
+        }
+        else if(dfn[x]<dfn[u])
+        {
+            s.push(e);
+            low[u]=min(low[u],dfn[x]);
+        }
+    }
+    if(f<0&&ch==1)iscut[u]=0;
+}
