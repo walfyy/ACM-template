@@ -1,0 +1,91 @@
+char s[N];
+int c[N],a[N];
+struct SAM{
+    int last,cnt;
+    int ch[N<<1][26],fa[N<<1],l[N<<1];
+    int mx[N<<1],tmp[N<<1];
+    void ins(int c){
+      /*if(ch[last][x])//插入的广义sam
+        {
+            int p=last,q=ch[last][x];
+            if(l[q]==l[p]+1)last=q;
+            else
+            {
+                int nq=++cnt;l[nq]=l[p]+1;
+                memcpy(ch[nq],ch[q],sizeof ch[q]);
+                fa[nq]=fa[q];fa[q]=last=nq;
+                for(;ch[p][x]==q;p=fa[p])ch[p][x]=nq;
+            }
+            return ;
+        }*/
+        int p=last,np=++cnt;last=np;l[np]=l[p]+1;
+        for(;p&&!ch[p][c];p=fa[p])ch[p][c]=np;
+        if(!p)fa[np]=1;
+        else
+        {
+            int q=ch[p][c];
+            if(l[p]+1==l[q])fa[np]=q;
+            else
+            {
+                int nq=++cnt;l[nq]=l[p]+1;
+                memcpy(ch[nq],ch[q],sizeof(ch[q]));
+                fa[nq]=fa[q];fa[q]=fa[np]=nq;
+                for(;ch[p][c]==q;p=fa[p])ch[p][c]=nq;
+            }
+        }
+    }
+    void build(){
+        int len=strlen(s+1);
+        last=cnt=1;
+        for(int i=1;i<=len;i++)ins(s[i]-'a');
+        topo();
+        for(int i=1;i<=cnt;i++)mx[i]=l[i],tmp[i]=0;
+    }
+    void topo(){
+        for(int i=1;i<=cnt;i++)c[l[i]]++;
+        for(int i=1;i<=cnt;i++)c[i]+=c[i-1];
+        for(int i=1;i<=cnt;i++)a[c[l[i]]--]=i;
+    }
+    void faupdate()
+    {
+        for(int i=cnt;i;i--)
+            tmp[fa[a[i]]]=max(tmp[fa[a[i]]],tmp[a[i]]);
+    }
+    void maupdate()
+    {
+        for(int i=1;i<=cnt;i++)
+            mx[i]=min(mx[i],tmp[i]),tmp[i]=0;
+    }
+    void match()//多串的公共子串
+    {
+        int len=strlen(s+1),val=0,now=1,res=0;
+        for(int i=1;i<=len;i++)
+        {
+            if(ch[now][s[i]-'a'])
+            {
+                now=ch[now][s[i]-'a'];
+                res++;
+            }
+            else
+            {
+                while(now&&!ch[now][s[i]-'a'])now=fa[now];
+                if(!now)now=1,res=0;
+                else
+                {
+                    res=l[now]+1;
+                    now=ch[now][s[i]-'a'];
+                }
+            }
+            tmp[now]=max(tmp[now],res);
+        }
+        faupdate();
+        maupdate();
+    }
+    int maxlen()
+    {
+        int ans=0;
+        for(int i=1;i<=cnt;i++)ans=max(ans,mx[i]);
+        return ans;
+    }
+}sam;
+//广义sam每次插入新串把cnt置为1
