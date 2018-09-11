@@ -1,0 +1,92 @@
+struct node {
+    node* ch[2];
+    int key, fix, sz, cnt;
+    void update() {
+        sz = ch[0]->sz + ch[1]->sz + cnt;
+    }
+};
+typedef node* P_node;
+struct Treap {
+    node base[N], nil;
+    P_node root, null, len;
+    Treap() {
+        root = null = &nil;
+        null->key = null->fix = 1e9;
+        null->sz = null->cnt = 0;
+        null->ch[0] = null->ch[1] = null;
+        len = base;
+    }
+    P_node newnode(int tkey) {
+        len->key = tkey;
+        len->fix = rand();
+        len->ch[0] = len->ch[1] = null;
+        len->sz = len->cnt = 1;
+        return len++;
+    }
+    void rot(P_node &p, int d) {
+        P_node k = p->ch[d ^ 1];
+        p->ch[d ^ 1] = k->ch[d];
+        k->ch[d] = p;
+        p->update();
+        k->update();
+        p = k;
+    }
+    void _Insert(P_node &p, int tkey) {
+        if(p == null) {
+            p = newnode(tkey);
+        } else if(p->key == tkey) {
+            p->cnt++;
+        } else {
+            int d = tkey > p->key;
+            _Insert(p->ch[d], tkey);
+            if(p->ch[d]->fix > p->fix) {
+                rot(p, d ^ 1);
+            }
+        }
+        p->update();
+    }
+    void _Delete(P_node &p, int tkey) {
+        if(p == null) return;
+        if(p->key == tkey) {
+            if(p->cnt > 1) p->cnt--;
+            else if(p->ch[0] == null) p = p->ch[1];
+            else if(p->ch[1] == null) p = p->ch[0];
+            else {
+                int d = p->ch[0]->fix > p->ch[1]->fix;
+                rot(p, d);
+                _Delete(p->ch[d], tkey);
+            }
+        } else {
+            _Delete(p->ch[tkey > p->key], tkey);
+        }
+        p->update();
+    }
+    int _Kth(P_node p, int k) {
+        if(p == null || k < 1 || k > p->sz) return 0;
+        if(k < p->ch[0]->sz + 1) return _Kth(p->ch[0], k);
+        if(k > p->ch[0]->sz + p->cnt) return _Kth(p->ch[1], k - p->ch[0]->sz - p->cnt);
+        return p->key;
+    }
+    int _Rank(P_node p, int tkey, int res) {
+        if(p == null) return -1;
+        if(p->key == tkey) return p->ch[0]->sz + res + 1;
+        if(tkey < p->key) return _Rank(p->ch[0], tkey, res);
+        return _Rank(p->ch[1], tkey, res + p->ch[0]->sz + p->cnt);
+    }
+    int _Pred(P_node p, int tkey){
+        if(p == null) return -1e9;
+        if(tkey <= p->key) return _Pred(p->ch[0], tkey);
+        return max(p->key, _Pred(p->ch[1], tkey));
+    }
+    int _Succ(P_node p, int tkey){
+        if(p == null) return 1e9;
+        if(tkey >= p->key) return _Succ(p->ch[1], tkey);
+        return min(p->key, _Succ(p->ch[0], tkey));
+    }
+    void Insert(int tkey){ _Insert(root,tkey); }
+    void Delete(int tkey){ _Delete(root,tkey); }
+    int Kth(int k){ return _Kth(root,k); }
+    int Rank(int tkey){ return _Rank(root,tkey,0); }
+    int Pred(int tkey){ return _Pred(root,tkey); }
+    int Succ(int tkey){ return _Succ(root,tkey); }
+};
