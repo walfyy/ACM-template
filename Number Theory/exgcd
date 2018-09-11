@@ -1,0 +1,19 @@
+求解a*x+b*y=c，r=gcd(a,b),当c%r==0时有解，用exgcd求出a*x+b*y=gcd(a,b)的解，
+然后x*c/gcd(a,b)就是其中一个解，最后求最小正整数解，就是(x%b+b)%b,要求y的话，对应求解即可
+ll exgcd(ll a,ll b,ll &x,ll &y)
+{
+    if(!b){x=1,y=0;return a;}
+    ll ans=exgcd(b,a%b,x,y);
+    ll t=x;x=y;y=t-a/b*y;
+    return ans;
+}
+int main()
+{
+    ll a,b,c,x,y;//a*x+b*y=c
+    ll r=gcd(a,b);
+    if(c%r!=0)return 0;
+    exgcd(a,b,x,y);
+    x*=c/r;//其中一解
+    x=(x%b+b)%b;//最小整数解
+    return 0;
+}
