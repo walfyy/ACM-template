@@ -1,0 +1,35 @@
+//suffix array
+char s[N];
+int sa[N], t[N], t2[N], c[N], rk[N], height[N], n;
+void buildSa(int n, int m) {
+    int i, j = 0, k = 0, *x = t, *y = t2;
+    for(i = 0; i < m; i++) c[i] = 0;
+    for(i = 0; i < n; i++) c[x[i] = s[i]]++;
+    for(i = 1; i < m; i++) c[i] += c[i - 1];
+    for(i = n - 1; i >= 0; i--) sa[--c[x[i]]] = i;
+    for(int k = 1; k < n; k <<= 1) {
+        int p = 0;
+        for(i = n - k; i < n; i++) y[p++] = i;
+        for(i = 0; i < n; i++) if(sa[i] >= k) y[p++] = sa[i] - k;
+        for(i = 0; i < m; i++) c[i] = 0;
+        for(i = 0; i < n; i++) c[x[y[i]]]++;
+        for(i = 1; i < m; i++) c[i] += c[i - 1];
+        for(i = n - 1; i >= 0; i--) sa[--c[x[y[i]]]] = y[i];
+        swap(x, y);
+        p = 1; x[sa[0]] = 0;
+        for(int i = 1; i < n; i++) {
+            if(y[sa[i - 1]] == y[sa[i]] && y[sa[i - 1] + k] == y[sa[i] + k])
+                x[sa[i]] = p - 1;
+            else x[sa[i]] = p++;
+        }
+        if(p >= n) break;
+        m = p;
+     }
+     for(i = 1; i < n; i++) rk[sa[i]] = i;
+     for(i = 0; i < n - 1; i++) {
+        if(k) k--;
+        j = sa[rk[i] - 1];
+        while(s[i + k] == s[j + k]) k++;
+        height[rk[i]] = k;
+     }
+}
