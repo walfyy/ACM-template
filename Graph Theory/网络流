@@ -1,0 +1,174 @@
+//最大流当前弧优化
+struct edge{
+    int to,Next,c;
+}e[maxn];
+int s,t,cnt,head[N],cur[N];
+int n,m;
+void init()
+{
+    cnt=0;
+    memset(head,-1,sizeof head);
+}
+void add(int u,int v,int c)
+{
+    e[cnt].to=v;
+    e[cnt].c=c;
+    e[cnt].Next=head[u];
+    head[u]=cnt++;
+    e[cnt].to=u;
+    e[cnt].c=0;
+    e[cnt].Next=head[v];
+    head[v]=cnt++;
+}
+int dis[N];
+bool bfs()
+{
+    queue<int>q;
+    memset(dis,-1,sizeof dis);
+    dis[s]=1;
+    q.push(s);
+    while(!q.empty())
+    {
+        int x=q.front();q.pop();
+        for(int i=head[x];~i;i=e[i].Next)
+        {
+            int y=e[i].to;
+            if(dis[y]==-1&&e[i].c>0)
+            {
+                dis[y]=dis[x]+1;
+                q.push(y);
+            }
+        }
+    }
+    return dis[t]!=-1;
+}
+int dfs(int u,ll mx)
+{
+    if(u==t)return mx;
+    ll f;
+    for(int &i=cur[u];~i;i=e[i].Next)
+    {
+        int x=e[i].to;
+        if(dis[x]==dis[u]+1&&e[i].c>0&&(f=dfs(x,min(mx,1ll*e[i].c))))
+        {
+            e[i].c-=f;
+            e[i^1].c+=f;
+            return f;
+        }
+    }
+    return 0;
+}
+ll maxflow()
+{
+    ll ans=0,f;
+    while(bfs())
+    {
+        for(int i=0;i<=n;i++)cur[i]=head[i];
+        while((f=dfs(s,inf)))ans+=f;
+    }
+    return ans;
+}
+
+//费用流
+struct edge{
+    int to,Next,c;
+    int cost;
+}e[maxn];
+int cnt,head[N];
+int s,t;
+int dis[N],pre[N],path[N];
+bool vis[N];
+void add(int u,int v,int c,int cost)
+{
+    e[cnt].to=v;
+    e[cnt].c=c;
+    e[cnt].cost=cost;
+    e[cnt].Next=head[u];
+    head[u]=cnt++;
+    e[cnt].to=u;
+    e[cnt].c=0;
+    e[cnt].cost=-cost;
+    e[cnt].Next=head[v];
+    head[v]=cnt++;
+}
+bool spfa()
+{
+    memset(pre,-1,sizeof pre);
+    memset(dis,inf,sizeof dis);
+    memset(vis,0,sizeof vis);
+    dis[s]=0;
+    vis[s]=1;
+    queue<int>q;
+    q.push(s);
+    while(!q.empty())
+    {
+        int x=q.front();
+        q.pop();
+        vis[x]=0;
+        for(int i=head[x];~i;i=e[i].Next)
+        {
+            int te=e[i].to;
+            if(e[i].c>0&&dis[x]+e[i].cost<dis[te])
+            {
+                dis[te]=dis[x]+e[i].cost;
+                pre[te]=x;
+                path[te]=i;
+                if(!vis[te])q.push(te),vis[te]=1;
+            }
+        }
+    }
+    return pre[t]!=-1;
+}
+int mincostmaxflow()
+{
+    int cost=0,flow=0;
+    while(spfa())
+    {
+        int f=inf;
+        for(int i=t;i!=s;i=pre[i])
+            if(e[path[i]].c<f)
+               f=e[path[i]].c;
+        flow+=f;
+        cost+=dis[t]*f;
+        for(int i=t;i!=s;i=pre[i])
+        {
+            e[path[i]].c-=f;
+            e[path[i]^1].c+=f;
+        }
+    }
+    return cost;
+}
+void init()
+{
+    memset(head,-1,sizeof head);
+    cnt=0;
+}
+//上下界网络流
+//无源汇可行流
+对于每一条边u->v,上界high，下界low，来说，我们可以建立每条边流量为high-low，那么这样得到的流量可能会不守恒（流入量！=流出量），
+这时我们要想使得流量守恒，我们需要建立附加流，附加流 是在刚才的图上的改进流，
+对于每一个点如果有流入量（in）>流出量（out），那么对于多余的流入量，我们需要想办法新加一条边流量为in-out流入该点，
+反之如果in<out，那么需要建立一条边流量为out-in流出该点，我们此时可以建立一个超级源和超级汇，
+此时我们在附加流上跑一遍最大流，如果从超级源出发的所有流量等于最大流，也就是说能保证流量守恒，
+那么就是有可行流，每条边的可行流等于该边的轮流下界+附加流中的流过的流量（既附加流中反向边的流量）
+//有源汇最大流,从汇点连一条边到源点，容量无穷大，下界为0,按无源汇超级源汇跑完得到可行流,再从源点s跑到汇点t就是最大流
+//有源汇最小流,按无源汇超级源汇跑完得到可行流,再从汇点连一条边到源点，容量无穷大，下界为0,再从超级源跑到超级汇就是最小流
+int n,m;
+scanf("%d%d",&n,&m);
+init();
+for(int i=0; i<m; i++)
+{
+    int a,b,c,d;
+    scanf("%d%d%d%d",&a,&b,&c,&d);
+    out[a]+=c;
+    in[b]+=c;
+    add(a,b,d-c,c);
+}
+s=n+1,t=n+2;
+int sum=0;
+for(int i=1; i<=n; i++)
+{
+    if(in[i]>out[i])sum+=in[i]-out[i],add(s,i,in[i]-out[i],0);
+    else add(i,t,out[i]-in[i],0);
+}
+sum==maxflow()//判断可行流
