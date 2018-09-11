@@ -1,0 +1,36 @@
+struct DSU {
+    int fa[N];
+    vector<int> base[N];
+    void add(int tar,int x) {
+        for(auto &t : base[tar])
+            x = min(x, x^t);
+        if(!x) return;
+        for(auto &t : base[tar])
+            t = min(t, t^x);
+        base[tar].push_back(x);
+    }
+    int query(int tar) {
+        int res=0;
+        for(auto &t : base[tar])
+            res = max(res, res^t);
+        return res;
+    }
+    void init(int n) {
+        for(int i = 1;i <= n; i++)
+            fa[i] = i, add(i,a[i]);
+    }
+    int find(int x) {
+        return fa[x]==x ? x : fa[x]=find(fa[x]);
+    }
+    void merge(int x,int y) {
+        x = find(x), y = find(y);
+        if(x == y)return;
+        fa[x] = y;
+        for(auto &v : base[x]) add(y,v);
+        base[x].clear();
+    }
+    int answer(int x) {
+        x=find(x);
+        return query(x);
+    }
+};
