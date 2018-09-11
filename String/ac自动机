@@ -148,3 +148,67 @@ struct Trie {
 }acm1,acm2;
 char s[N];
 //带删除的ac自动机，建两颗ac自动机即可，一颗表示删除
+
+struct Ac {
+    int val[N], ch[N][26], f[N], last[N], cnt, SZ;
+    void init(int SZ = 26) {
+        cnt = 0; this->SZ = SZ;
+        for(int c = 0; c < SZ; c++) ch[0][c] = 0;
+    }
+    int getId(char c) {
+        return c - 'a';
+    }
+    int newNode() {
+        cnt++;
+        memset(ch[cnt], 0, sizeof(ch[cnt]));
+        val[cnt] = f[cnt] = last[cnt] = 0;
+        return cnt;
+    }
+    void add(char *s) {
+        int u = 0;
+        for(int i = 0; s[i]; i++) {
+            int c = getId(s[i]);
+            if(!ch[u][c]) ch[u][c] = newNode();
+            u = ch[u][c];
+        }
+        val[u]++;
+    }
+    void build() {
+        queue<int> que;
+        f[0] = 0;
+        for(int c = 0; c < SZ; c++) {
+            if(!ch[0][c]) continue;
+            f[ch[0][c]] = last[ch[0][c]] = 0;
+            que.push(ch[0][c]);
+        }
+        while(!que.empty()) {
+            int u = que.front(); que.pop();
+            for(int c = 0; c < SZ; c++) {
+                int v = ch[u][c];
+                if(!v) {
+                    ch[u][c] = ch[f[u]][c];
+                    continue;
+                } else {
+                    que.push(v);
+                    f[v] = ch[f[u]][c];
+                    last[v] = val[f[v]] ? f[v] : last[f[v]];
+                }
+            }
+        }
+    }
+    LL cal(char *s) {
+        LL ans = 0;
+        for(int i = 0, j; s[i]; i++) {
+            int c = getId(s[i]);
+            j = ch[j][c];
+            int p = j;
+            while(p && val[p] != -1) {
+                ans += val[p];
+                val[p] = -1;
+                p = last[p];
+            }
+        }
+        return ans;
+    }
+};
+
