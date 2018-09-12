@@ -1,0 +1,100 @@
+/*
+斯坦纳树是在一个图中选取某些特定点使其联通(可以选取额外的点),要求花费最小,最小生成树是斯坦纳树的一种特殊情况
+我们用dp[i][j]来表示以i为根,和j状态是否和i联通,那么有
+转移方程:
+dp[i][j]=min(dp[i][s]+dp[j-s]-a[i][j]) (表示有两个状态s和j-s都和i联通,我们把这两个状态联通起来,这样多算了一次a[i][j],减去即可)
+dp[i][j]=min(dp[i][j],dp[k][j]+a[i][k]) (如果i和k连着,那么,链接i和k,更新dp[i][j]),此处类似与最短路中的松弛操作
+也可dij松弛
+*/
+struct Pre{
+    int x,y,st;
+}pre[N][N][maxn];
+int f[N][N][maxn],n,m,a[N][N];
+queue<pii>q;
+bool vis[N][N];
+int dx[4]={0,0,1,-1};
+int dy[4]={1,-1,0,0};
+void spfa(int st)
+{
+    while(!q.empty())
+    {
+        pii p=q.front();q.pop();
+        vis[p.fi][p.se]=0;
+        for(int i=0;i<4;i++)
+        {
+            int nx=p.fi+dx[i],ny=p.se+dy[i];
+            if(1<=nx&&nx<=n&&1<=ny&&ny<=m)
+            {
+                if(f[p.fi][p.se][st]+a[nx][ny]<f[nx][ny][st])
+                {
+                    f[nx][ny][st]=f[p.fi][p.se][st]+a[nx][ny];
+                    pre[nx][ny][st]={p.fi,p.se,st};
+                    if(!vis[nx][ny])
+                    {
+                        vis[nx][ny]=1;
+                        q.push(mp(nx,ny));
+                    }
+                }
+            }
+        }
+    }
+}
+void dfs(int x,int y,int st)
+{
+    vis[x][y]=1;
+    Pre p=pre[x][y][st];
+    if(!p.x)return ;
+    dfs(p.x,p.y,p.st);
+    if(x==p.x&&y==p.y)
+        dfs(p.x,p.y,st-p.st);
+}
+int main()
+{
+    int cnt=0,ansx=-1,ansy;
+    scanf("%d%d",&n,&m);
+    memset(f,inf,sizeof f);
+    for(int i=1;i<=n;i++)
+    {
+        for(int j=1;j<=m;j++)
+        {
+            scanf("%d",&a[i][j]);
+            if(!a[i][j])
+            {
+                f[i][j][(1<<cnt)]=0;cnt++;
+                if(ansx==-1)ansx=i,ansy=j;
+            }
+        }
+    }
+    for(int st=0;st<(1<<cnt);st++)
+    {
+        for(int i=1;i<=n;i++)
+        {
+            for(int j=1;j<=m;j++)
+            {
+                for(int s=st;s;s=(s-1)&st)
+                {
+                    if(f[i][j][s]+f[i][j][st-s]-a[i][j]<f[i][j][st])
+                    {
+                        f[i][j][st]=f[i][j][s]+f[i][j][st-s]-a[i][j];
+                        pre[i][j][st]={i,j,s};
+                    }
+                }
+                if(f[i][j][st]<inf)q.push(mp(i,j)),vis[i][j]=1;
+            }
+        }
+        spfa(st);
+    }
+    printf("%d\n",f[ansx][ansy][(1<<cnt)-1]);
+    memset(vis,0,sizeof vis);
+    dfs(ansx,ansy,(1<<cnt)-1);
+    for(int i=1;i<=n;i++)
+    {
+        for(int j=1;j<=m;j++)
+        {
+            if(!a[i][j])putchar('x');
+            else putchar(vis[i][j]?'o':'_');
+        }
+        puts("");
+    }
+    return 0;
+}
