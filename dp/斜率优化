@@ -1,0 +1,27 @@
+ll sum[N],dp[N],n,l,q[N];
+inline ll x(int j)
+{
+    return sum[j];
+}
+inline ll y(int j)
+{
+    return dp[j]+(sum[j]+l)*(sum[j]+l);
+}
+inline double slope(int a,int b)
+{
+    return (y(b)-y(a))/(x(b)-x(a));
+}
+int main()
+{
+    int head=1,last=1;q[head]=0;
+    for(int i=1;i<=n;i++)
+    {
+        while(head<last&&slope(q[head],q[head+1])<2*sum[i])head++;
+        int te=q[head];
+        dp[i]=dp[te]+sum[i];//转移
+        while(head<last&&slope(q[last-1],q[last])>slope(q[last],i))last--;
+        q[++last]=i;
+    }
+    printf("%lld\n",dp[n]);
+    return 0;
+}
