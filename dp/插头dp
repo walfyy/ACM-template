@@ -1,0 +1,60 @@
+//有障碍物的多回路的插头dp，求方案数
+const int N=(1ll<<12)+10;
+ll dp[2][N];
+int n,m,a[12][12];
+ll solve()
+{
+    memset(dp,0,sizeof dp);
+    int now=0,pre=1;
+    dp[now][0]=1;
+    for(int i=1;i<=n;i++)
+    {
+        for(int j=1;j<=m;j++)
+        {
+            swap(now,pre);
+            memset(dp[now],0,sizeof dp[now]);
+            if(a[i][j]==0)
+            {
+                for(int k=0;k<(1<<(m+1));k++)
+                    if((!((k>>m)&1)) && (!(k&1)))
+                        dp[now][k<<1]+=dp[pre][k];
+                continue;
+            }
+            for(int k=0;k<(1<<(m+1));k++)
+            {
+                if(((k>>m)&1) && (!(k&1)))
+                {
+                    if(j!=m)dp[now][((k^(1<<m))<<1)|1]+=dp[pre][k];
+                    if(i!=n)dp[now][((k^(1<<m))<<1)|2]+=dp[pre][k];
+                }
+                else if((!((k>>m)&1)) && (k&1))
+                {
+                    if(i!=n)dp[now][k<<1]+=dp[pre][k];
+                    if(j!=m)dp[now][(k<<1)^3]+=dp[pre][k];
+                }
+                else if((!((k>>m)&1)) && (!(k&1)))
+                {
+                    if(j!=m&&i!=n)dp[now][(k<<1)|3]+=dp[pre][k];
+                }
+                else
+                {
+                    dp[now][((k^(1<<m))<<1)^2]+=dp[pre][k];
+                }
+            }
+        }
+    }
+    return dp[now][0];
+}
+int main()
+{
+    int T;scanf("%d",&T);
+    for(int _=1;_<=T;_++)
+    {
+        scanf("%d%d",&n,&m);
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=m;j++)
+                scanf("%d",&a[i][j]);
+        printf("Case %d: There are %lld ways to eat the trees.\n",_,solve());
+    }
+    return 0;
+}
