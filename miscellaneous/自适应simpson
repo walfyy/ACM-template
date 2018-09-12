@@ -1,0 +1,15 @@
+double f(double t)//需积分的函数
+{
+    return 1;
+}
+double simpson(double l,double r)
+{
+    return (f(l)+4*f((l+r)/2)+f(r))*(r-l)/6;
+}
+double solve(double l,double r)
+{
+    double m=(l+r)/2.0;
+    double res=simpson(l,r);
+    if(fabs(res-simpson(l,m)-simpson(m,r))<eps)return res;
+    else return solve(l,m)+solve(m,r);
+}
