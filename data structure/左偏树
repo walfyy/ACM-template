@@ -1,0 +1,53 @@
+//插入删除合并O(logn),取栈顶O(1)
+int val[N],dis[N],f[N],ch[N][2];
+int Merge(int x,int y)//合并两个小根堆
+{
+    if(x==0||y==0)return x+y;
+    if(val[x] > val[y] ||val[x]==val[y] && x>y)swap(x,y);
+    ch[x][1] = Merge(ch[x][1],y);
+    f[ch[x][1]] = x;
+    if(dis[ch[x][0]] < dis[ch[x][1]])swap(ch[x][0],ch[x][1]);
+    dis[x] = dis[ch[x][1]]+1;
+    return x;
+}
+int getf(int x)
+{
+    while(f[x])x=f[x];
+    return x;
+}
+void pop(int x)//删除栈顶
+{
+    val[x]=-1;
+    f[ch[x][0]]=f[ch[x][1]]=0;
+    Merge(ch[x][0],ch[x][1]);
+}
+int main()
+{
+    int n,m;
+    scanf("%d%d",&n,&m);
+    dis[0]=-1;
+    for(int i=1;i<=n;i++)
+        scanf("%d",&val[i]);
+    while(m--)
+    {
+        int op,x,y;
+        scanf("%d%d",&op,&x);
+        if(op==1)
+        {
+            scanf("%d",&y);
+            if(val[x]==-1||val[y]==-1||getf(x)==getf(y))continue;
+            Merge(getf(x),getf(y));
+        }
+        else
+        {
+            if(val[x]==-1)puts("-1");
+            else
+            {
+                int p=getf(x);
+                printf("%d\n",val[p]);
+                pop(p);
+            }
+        }
+    }
+    return 0;
+}
