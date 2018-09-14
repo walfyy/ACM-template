@@ -1,0 +1,38 @@
+bool Miller_Rabbin(ll n,int a)
+{
+    int r=0,s=n-1,j;
+    if(!(n%a))return false;
+    while(!(s&1))s>>=1,r++;
+    ll k=qp(a,s,n);
+    if(k==1)return true;
+    for(j=0;j<r;j++,k=k*k%n)
+        if(k==n-1)
+            return true;
+    return false;
+}
+bool mr(ll n)
+{
+    int a[]={2,3,5,7};
+    for(int i=0;i<4;i++)
+    {
+        if(n==a[i])return true;
+        if(!Miller_Rabbin(n,a[i]))return false;
+    }
+    return true;
+}
+int main()
+{
+    srand(time(NULL));
+    int n,ans;
+    while(~scanf("%d",&n))
+    {
+        ans=0;
+        for(int i=0;i<n;i++)
+        {
+            ll x;scanf("%lld",&x);
+            ans+=mr(x);
+        }
+        printf("%d\n",ans);
+    }
+    return 0;
+}
