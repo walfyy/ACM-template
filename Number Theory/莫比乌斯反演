@@ -14,19 +14,16 @@ void init()
             int t=i*prime[j];
             if(t>N)break;
             mark[t]=1;
-            if(i%prime[j]==0){mu[t]=0;break;}
-            else mu[t]=-mu[i];
-        }
-    }
-    for(int i=1;i<N;i++)sum[i]=sum[i-1]+mu[i];
-}
-ll cal(int n,int m)
-{
-    ll ans=0;
-    for(int i=1,last;i<=min(n,m);i=last+1)
-    {
-        last=min(n/(n/i),m/(m/i));
-        ans+=(ll)(sum[last]-sum[i-1])*(n/i)*(m/i);
-    }
-    return ans;
-}
+[n==1] == $\sum_{d|n}μ(d)
+$I(n)=1$(常函数)
+$\mu(n)$(莫比乌斯函数)
+$\phi(n)$(欧拉函数)
+$\e(n)=[n==1]$(单位函数)
+$id(n)=n$
+因为$\sum_{d|n}\mu(d)=[n==1]$,所以$I*\mu=\e$
+因为$n=\sum_{d|n}\phi(d)$，所以$I*\phi=id$
+\phi=id*\mu
+狄利克雷卷积:$(f*g)(n)=\sum_{d|n}f(d)*g(\frac{n}{d})$
+
+积性函数倍数和
+$\sum_{i=1}^mf(i*n)=-\sum_{i=1}^mf(i*\frac{n}{d})+\sum_{i=1}^{ \lfloor \frac{m}{d} \rfloor}f(i*n)$
