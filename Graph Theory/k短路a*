@@ -1,0 +1,87 @@
+//最坏O(nklogn)
+struct edge{int to,Next,c;}e[maxn][2];
+int cnt[2],head[N][2];
+void init()
+{
+    cnt[0]=cnt[1]=0;
+    memset(head,-1,sizeof head);
+}
+void add(int u,int v,int c,int op)
+{
+    e[cnt[op]][op].to=v;
+    e[cnt[op]][op].c=c;
+    e[cnt[op]][op].Next=head[u][op];
+    head[u][op]=cnt[op]++;
+}
+int dis[N],s,t,k;
+ll ma;
+priority_queue<pii>q;
+bool dij()
+{
+    memset(dis,inf,sizeof dis);
+    dis[t]=0;
+    q.push(mp(dis[t],t));
+    while(!q.empty())
+    {
+        pii x=q.top();q.pop();
+        if(x.fi>dis[x.se])continue;
+        for(int i=head[x.se][1];~i;i=e[i][1].Next)
+        {
+            int u=e[i][1].to;
+            if(dis[u]>dis[x.se]+e[i][1].c)
+            {
+                dis[u]=dis[x.se]+e[i][1].c;
+                q.push(mp(dis[u],u));
+            }
+        }
+    }
+    return dis[s]!=inf;
+}
+struct node{
+    ll h;
+    int g,id;
+    bool operator <(const node&rhs)const
+    {
+        return h+g>rhs.h+rhs.g;
+    }
+};
+priority_queue<node>qq;
+ll astar()
+{
+    int num=0;
+    qq.push({0,dis[s],s});
+    while(!qq.empty())
+    {
+        node x=qq.top();qq.pop();
+        if(x.id==t)
+        {
+            num++;
+            if(x.h>ma)return INF;
+        }
+        if(num==k)return x.h;
+        for(int i=head[x.id][0];~i;i=e[i][0].Next)
+        {
+            int u=e[i][0].to;
+            qq.push({x.h+e[i][0].c,dis[u],u});
+        }
+    }
+    return -1;
+}
+int main()
+{
+    int n,m;
+    while(~scanf("%d%d",&n,&m))
+    {
+        init();
+        scanf("%d%d%d%lld",&s,&t,&k,&ma);
+        for(int i=0,a,b,c;i<m;++i)
+        {
+            scanf("%d%d%d",&a,&b,&c);
+            add(a,b,c,0);add(b,a,c,1);
+        }
+        if(!dij()){puts("Whitesnake!");continue;}
+        if(s==t)k++;
+        printf("%s\n",astar()<=ma?"yareyaredawa":"Whitesnake!");
+    }
+    return 0;
+}
