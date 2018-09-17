@@ -1,0 +1,103 @@
+const double eps = 1e-10;
+const double PI = acos(-1);
+
+int dcmp(double x) {
+    if(fabs(x) < eps) return 0;
+    else return x < 0 ? -1 : 1;
+}
+
+struct Point {
+    double x, y;
+    Point(double x = 0, double y = 0) : x(x), y(y) {}
+};
+
+typedef Point Vector;
+
+struct Circle {
+    Point c;
+    double r;
+    Circle(Point c, double r):c(c),r(r){}
+   
+};
+Point operator + (Vector A, Vector B) {return Point(A.x + B.x, A.y + B.y);}
+Point operator - (Vector A, Vector B) {return Point(A.x - B.x, A.y - B.y);}
+Point operator * (Vector A, double p) {return Point(A.x * p, A.y * p);}
+Point operator / (Vector A, double p) {return Point(A.x / p, A.y / p);}
+bool operator < (const Vector &A, const Vector &B) {return A.y < B.y || (A.y == B.y && A.x < B.x);}
+bool operator == (const Vector &A, const Point &B) {return dcmp(A.x - B.x) == 0 && dcmp(A.y - B.y) == 0;}
+double Dot(Vector A, Vector B) {return A.x * B.x + A.y * B.y;}
+double Length(Vector A) {return sqrt(Dot(A, A));}
+double Angle(Vector A, Vector B) {return acos(Dot(A, B)/Length(A)/Length(B));}
+double Cross(Vector A, Vector B) {return A.x * B.y - A.y * B.x;}
+double Area2(Point A, Point B, Point C) {return Cross(B-A, C-A);}
+
+Vector Normal(Vector A) {
+    double L = Length(A);
+    return Vector(-A.y/L, A.x/L);
+}
+
+Vector Rotate(Vector A, double rad) {
+    return Vector(A.x * cos(rad) - A.y * sin(rad), A.x * sin(rad) + A.y * cos(rad));
+}
+
+Point GetLineIntersection(Point P, Vector v, Point Q, Vector w) {
+    Vector u = P - Q;
+    double t = Cross(w, u) / Cross(v, w);
+    return P + v * t;
+}
+
+double DistanceToLine(Point P, Point A, Point B) {
+    Vector v1 = B - A, v2 = P - A;
+    return fabs(Cross(v1, v2) / Length(v1));
+}
+double DistanceTosegment(Point P, Point A, Point B) {
+    if(A == B) return Length(P-A);
+    Vector v1 = B - A, v2 = P - A, v3 = P - B;
+    if(dcmp(Dot(v1, v2)) < 0) return Length(v2);
+    else if(dcmp(Dot(v1, v3)) > 0) return Length(v3);
+    else return fabs(Cross(v1, v2) / Length(v1));
+}
+Point GetLineProjection(Point P, Point A, Point B) {
+    Vector v = B - A;
+    return A+v*(Dot(v, P-A) / Dot(v, v));
+}
+bool SegmentProperIntersection(Point a1, Point a2, Point b1, Point b2) {
+    double c1 = Cross(a2-a1,b1-a1), c2 = Cross(a2-a1,b2-a1);
+    double c3 = Cross(b2-b1,a1-b1), c4 = Cross(b2-b1,a2-b1);
+    return dcmp(c1)*dcmp(c2)<0 && dcmp(c3)*dcmp(c4)<0;
+}
+bool Onsegment(Point p, Point a1, Point a2) {
+    return dcmp(Cross(a1-p, a2-p)) == 0 && dcmp(Dot(a1-p,a2-p)) < 0;
+}
+double PolygonArea(Point *p, int n) {
+    double area = 0;
+    for(itn i = 1; i < n - 1; i++)
+        area += Cross(p[i]-p[0], p[i+1]-p[0]);
+    return fabs(area/2);
+}
+double TwoCircleArea(Point a, double r1, Point b, double r2) {
+    double d = Length(a - b);
+    if(d >= r1 + r2) return 0;
+    if(r1 > r2) swap(r1, r2);
+    if(r2-r1 >= d) return pi*r1*r1;
+    double ang1 = acos((r1*r1+d*d-r2*r2)/(2*r1*d));
+    double ang2 = acos((r2*r2+d*d-r1*r1)/(2*r2*d));
+    return ang1*r1*r1+ang2*r2*r2-r1*d*sin(ang1);
+}
+int ConvexHull(Point *p, int n, Point *ch) {
+    sort(p, p + n);
+    int m = 0;
+    for(int i = 0; i < n; i++) {
+        while(m > 1 && dcmp(Cross(ch[m - 1] - ch[m - 2], p[i] - ch[m - 2])) <= 0) m--;
+        ch[m++] = p[i];
+    }
+    int k = m;
+    for(int i = n - 2; i >= 0; i--) {
+        while(m > k && dcmp(Cross(ch[m - 1] - ch[m - 2], p[i] - ch[m - 2])) <= 0) m--;
+        ch[m++] = p[i];
+    }
+    return m;
+}
+/*
+*/
+
