@@ -1,0 +1,74 @@
+int n,k,idx;
+struct node{
+    int f[5];
+    bool operator <(const node&rhs)const{
+        return f[idx]<rhs.f[idx];
+    }
+}a[N];
+priority_queue<pair<double,node> >q;
+struct kdtree{
+    bool vis[N<<2];
+    node date[N<<2];
+    void build(int l,int r,int rt,int dep)
+    {
+        if(l>r)return ;
+        vis[rt]=1;
+        vis[rt<<1]=vis[rt<<1|1]=0;
+        idx=dep%k;
+        int m=(l+r)>>1;
+        nth_element(a+l,a+m,a+r+1);
+        date[rt]=a[m];
+        build(l,m-1,rt<<1,dep+1);
+        build(m+1,r,rt<<1|1,dep+1);
+    }
+    void query(node p,int m,int rt,int dep)
+    {
+        if(!vis[rt])return ;
+        printf("%d \n",rt);
+        pair<double,node>cur(0,date[rt]);
+        for(int i=0;i<k;i++)
+            cur.fi+=(cur.se.f[i]-p.f[i])*(cur.se.f[i]-p.f[i]);
+        int dim=dep%k;
+        bool fg=0;
+        int x=rt<<1,y=rt<<1|1;
+        if(p.f[dim]>=date[rt].f[dim])swap(x,y);
+        if(vis[x])query(p,m,x,dep+1);
+        if(q.size()<m)q.push(cur),fg=1;
+        else
+        {
+            if(cur.fi<q.top().fi)
+            {
+                q.pop();q.push(cur);
+            }
+            if((p.f[dim]-date[rt].f[dim])*(p.f[dim]-date[rt].f[dim])<q.top().fi)fg=1;
+        }
+        if(vis[y]&&fg)query(p,m,y,dep+1);
+    }
+}kd;
+int main()
+{
+    while(scanf("%d%d",&n,&k)!=EOF)
+    {
+        for(int i=0;i<n;i++)
+            for(int j=0;j<k;j++)
+                scanf("%d",&a[i].f[j]);
+        kd.build(0,n-1,1,0);
+        int t;scanf("%d",&t);
+        while(t--)
+        {
+            node p;
+            for(int i=0;i<k;i++)scanf("%d",&p.f[i]);
+            int m;scanf("%d",&m);
+            while(!q.empty())q.pop();
+//            printf("%d\n",idx);
+            kd.query(p,m,1,0);
+            printf("the closest %d points are:\n",m);
+            node ans[25];
+            for(int i=0;!q.empty();i++)ans[i]=q.top().se,q.pop();
+            for(int i=m-1;i>=0;i--)
+                for(int j=0;j<k;j++)
+                    printf("%d%c",ans[i].f[j],j==k-1?'\n':' ');
+        }
+    }
+    return 0;
+}
