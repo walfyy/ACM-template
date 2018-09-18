@@ -1,2 +1,2 @@
 # ACM-template
-tyemplate for acm icpc/ccpc
+template for acm icpc/ccpc
