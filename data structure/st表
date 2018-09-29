@@ -15,3 +15,32 @@ struct ST {
 }
 for(int i = -(Log[0]=-1); i < N; i++)
     Log[i] = Log[i - 1] + ((i & (i - 1)) == 0);
+
+//二维
+struct ST2 {
+    short dp[N][N][10][10], ty;
+    void build(int n, int m, int b[N][N], int _ty) {
+        ty = _ty;
+        for(int i = 1; i <= n; i++)
+            for(int j = 1; j <= m; j++)
+                dp[i][j][0][0] = ty * b[i][j];
+        for(int u = 0; u <= Log[n]; u++) {
+            for(int v = 0; v <= Log[m]; v++) {
+                if(!u && !v) continue;
+                for(int i = 1; i+(1<<u)-1 <= n; i++) {
+                    for(int j = 1; j+(1<<v)-1 <= m; j++) {
+                        if(u) dp[i][j][u][v] = max(dp[i][j][u-1][v], dp[i+(1<<(u-1))][j][u-1][v]);
+                        else  dp[i][j][u][v] = max(dp[i][j][u][v-1], dp[i][j+(1<<(v-1))][u][v-1]);
+                    }
+                }
+            }
+        }
+    }
+    int query(int x1, int y1, int x2, int y2) {
+        int k1 = Log[x2-x1+1], k2 = Log[y2-y1+1];
+        x2 = x2-(1<<k1)+1;
+        y2 = y2-(1<<k2)+1;
+        return max(max(dp[x1][y1][k1][k2], dp[x2][y1][k1][k2]),
+                   max(dp[x1][y2][k1][k2], dp[x2][y2][k1][k2]));
+    }
+}
