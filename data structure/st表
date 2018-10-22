@@ -40,7 +40,7 @@ struct ST2 {
         int k1 = Log[x2-x1+1], k2 = Log[y2-y1+1];
         x2 = x2-(1<<k1)+1;
         y2 = y2-(1<<k2)+1;
-        return max(max(dp[x1][y1][k1][k2], dp[x2][y1][k1][k2]),
+        return ty*max(max(dp[x1][y1][k1][k2], dp[x2][y1][k1][k2]),
                    max(dp[x1][y2][k1][k2], dp[x2][y2][k1][k2]));
     }
 }
