@@ -1,0 +1,32 @@
+Point GetCircleCenter(Point A, Point B, Point C) {
+    Point o;
+    double a1 = B.x-A.x, b1 = B.y-A.y, c1 = (a1*a1+b1*b1)/2;
+	double a2 = C.x-A.x, b2 = C.y-A.y, c2 = (a2*a2+b2*b2)/2;
+	double d = a1*b2-a2*b1;
+	o.x=A.x+(c1*b2-c2*b1)/d;
+	o.y=A.y+(a1*c2-a2*c1)/d;
+	return o;
+}
+
+void MinPointCoverByCircle(Point *p, int n, Point &o, double &r) {
+    random_shuffle(p, p+n);
+    o = p[0], r = 0;
+    for(int i = 1; i < n; i++) {
+        if(dist(p[i], o) > r + eps) {
+            o = p[i]; r = 0;
+            for(int j = 0; j < i; j++) {
+                if(dist(p[j], o) > r + eps) {
+                    o.x = (p[i].x+p[j].x)/2;
+                    o.y = (p[i].y+p[j].y)/2;
+                    r = dist(p[j], o);
+                    for(int k = 0; k < j; k++) {
+                        if(dist(p[k], o) > r + eps) {
+                            o = GetCircleCenter(p[i], p[j], p[k]);
+                            r = dist(p[i], o);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
