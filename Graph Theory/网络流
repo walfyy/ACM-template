@@ -42,21 +42,23 @@ bool bfs()
     }
     return dis[t]!=-1;
 }
-int dfs(int u,ll mx)
+ll dfs(int u,ll mx)
 {
     if(u==t)return mx;
-    ll f;
+    ll flow=0,f;
     for(int &i=cur[u];~i;i=e[i].Next)
     {
         int x=e[i].to;
-        if(dis[x]==dis[u]+1&&e[i].c>0&&(f=dfs(x,min(mx,1ll*e[i].c))))
+        if(dis[x]==dis[u]+1&&e[i].c>0&&(f=dfs(x,min(mx-flow,1ll*e[i].c))))
         {
             e[i].c-=f;
             e[i^1].c+=f;
-            return f;
+            flow+=f;
+            if(flow == mx) break;
         }
     }
-    return 0;
+    if(flow==0)dis[u]=-2;
+    return flow;
 }
 ll maxflow()
 {
