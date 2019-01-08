@@ -1,0 +1,65 @@
+
+int dcmp(double x) {
+    if(fabs(x) <= eps) return 0;
+    return x < 0 ? -1 : 1;
+}
+
+struct Point3 {
+    double x, y, z;
+    void read(){scanf("%lf%lf%lf",&x,&y,&z);}
+    Point3(double x=0, double y=0, double z=0):x(x), y(y), z(z) {}
+    bool operator == (const Point3 &rhs) const {
+        return dcmp(x-rhs.x)==0 && dcmp(y-rhs.y) == 0 && dcmp(z-rhs.z == 0);
+    }
+}a,d,n;
+
+typedef Point3 Vector3;
+
+Vector3 operator + (Vector3 A, Vector3 B) {
+    return Vector3(A.x+B.x, A.y+B.y, A.z+B.z);
+}
+Vector3 operator - (Vector3 A, Vector3 B) {
+    return Vector3(A.x-B.x, A.y-B.y, A.z-B.z);
+}
+Vector3 operator * (Vector3 A, double p) {
+    return Vector3(A.x*p, A.y*p, A.z*p);
+}
+Vector3 operator / (Vector3 A, double p) {
+    return Vector3(A.x/p, A.y/p, A.z/p);
+}
+double Dot(Vector3 A, Vector3 B) {
+    return A.x*B.x + A.y*B.y + A.z*B.z;
+}
+double Length(Vector3 A) {
+    return sqrt(Dot(A, A));
+}
+double Angle(Vector3 A, Vector3 B) {
+    return acos(Dot(A, B)/Length(A)/Length(B));
+}
+Vector3 Cross(Vector3 A, Vector3 B) {
+    return Vector3(A.y*B.z-A.z*B.y, A.z*B.x-A.x*B.z, A.x*B.y-A.y*B.x);
+}
+
+Vector3 ro(Vector3 s,Vector3 e,Vector3 p,db ang)//p绕s->e旋转ang度
+{
+    if(dcmp(Length(Cross(s-p,e-p)))==0)return p;
+    Vector3 f1=Cross(e-s,p-s),f2=Cross(e-s,f1);
+    db len=Length(Cross(s-p,e-p))/Length(s-e);
+    f1 = f1/Length(f1)*len,f2 = f2/Length(f2)*len;
+    Vector3 h=p+f2,pp=h+f1;
+    return h+(p-h)*cos(ang)+(pp-h)*sin(ang);
+}
+int main()
+{
+    freopen("jupiter.in","r",stdin);
+    int T;scanf("%d",&T);
+    while(T--)
+    {
+        db l,h;
+        n.read();a.read();scanf("%lf%lf",&l,&h);
+        d={0,0,-h};
+        printf("%.12f %.12f %.12f\n",Length(d-a),Length(d-ro({0,0,0},n,a,pi*2/3)),Length(d-ro({0,0,0},n,a,pi*4/3)));
+    }
+    return 0;
+}
+
