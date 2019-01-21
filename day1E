@@ -1,0 +1,77 @@
+//#pragma GCC optimize(2)
+//#pragma GCC optimize(3)
+//#pragma GCC optimize(4)
+//#pragma GCC optimize("unroll-loops")
+//#pragma comment(linker, "/stack:200000000")
+//#pragma GCC optimize("Ofast,no-stack-protector")
+//#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
+#include<bits/stdc++.h>
+#define fi first
+#define se second
+#define db double
+#define mp make_pair
+#define pb push_back
+#define pi acos(-1.0)
+#define ll long long
+#define vi vector<int>
+#define mod 1000000009
+#define ld long double
+//#define C 0.5772156649
+//#define ls l,m,rt<<1
+//#define rs m+1,r,rt<<1|1
+#define pll pair<ll,ll>
+#define pil pair<int,ll>
+#define pli pair<ll,int>
+#define pii pair<int,int>
+#define ull unsigned long long
+//#define base 1000000000000000000
+#define fin freopen("a.txt","r",stdin)
+#define fout freopen("a.txt","w",stdout)
+#define fio ios::sync_with_stdio(false);cin.tie(0)
+inline ll gcd(ll a,ll b){return b?gcd(b,a%b):a;}
+inline void sub(ll &a,ll b){a-=b;if(a<0)a+=mod;}
+inline void add(ll &a,ll b){a+=b;if(a>=mod)a-=mod;}
+template<typename T>inline T const& MAX(T const &a,T const &b){return a>b?a:b;}
+template<typename T>inline T const& MIN(T const &a,T const &b){return a<b?a:b;}
+inline ll qp(ll a,ll b){ll ans=1;while(b){if(b&1)ans=ans*a%mod;a=a*a%mod,b>>=1;}return ans;}
+inline ll qp(ll a,ll b,ll c){ll ans=1;while(b){if(b&1)ans=ans*a%c;a=a*a%c,b>>=1;}return ans;}
+
+using namespace std;
+
+const ull ba=233;
+const db eps=1e-5;
+const ll INF=0x3f3f3f3f3f3f3f3f;
+const int N=1000+10,maxn=1000000+10,inf=0x3f3f3f3f;
+
+vi v[N];
+int dp[N][2],a[N],b[N];
+void dfs(int u,int f)
+{
+    if(v[u].size()==0)dp[u][1]=a[u];
+    for(int x:v[u])
+    {
+        if(x==f)continue;
+        dfs(x,u);
+        for(int i=0;i<2;i++)dp[u][0]=max(dp[u][0],dp[x][i]);
+        dp[u][1]=max(dp[u][1],dp[x][0]+a[u]);
+        dp[u][1]=max(dp[u][1],dp[x][1]+a[u]-b[u]);
+    }
+}
+int main()
+{
+    int n;scanf("%d",&n);
+    for(int i=1;i<=n;i++)scanf("%d",&a[i]);
+    for(int i=1;i<=n;i++)
+    {
+        scanf("%d",&b[i]);
+        if(i==1)continue;
+        if(i&1)v[i].pb(3*i+1);
+        else v[i/2].pb(i);
+    }
+    dfs(1,0);   
+    printf("%d\n",max(dp[1][0],dp[1][1]));
+    return 0;
+}
+/********************
+
+********************/
