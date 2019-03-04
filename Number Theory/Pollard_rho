@@ -46,6 +46,7 @@ ll pollard(ll n,ll c){
     }
 }
 void Find(ll n){
+    if(n==1)return;
     if (miller(n)){f[++cnt]=n;return ;}
     ll p=n;
     while (p>=n) p=pollard(p,rand()%(n-1)+1);
