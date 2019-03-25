@@ -14,6 +14,9 @@ void init()
             int t=i*prime[j];
             if(t>N)break;
             mark[t]=1;
+        }
+     }
+}
 [n==1] == $\sum_{d|n}μ(d)
 $I(n)=1$(常函数)
 $\mu(n)$(莫比乌斯函数)
