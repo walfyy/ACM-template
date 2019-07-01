@@ -13,7 +13,8 @@ xn+2 = 2x0xn+1-xn,yn+2 = 2x0yn+1-yn.
 gcd(2^{f_x}-1,2^{f_y}-1)=2^{gcd(f_x,f_y)}-1=2^{f_gcd(x,y)}-1,f是斐波那契数列
 
 拉格朗日差值:n个点插值
-<img src="https://latex.codecogs.com/gif.latex?l_k(x)=(x-x_0)*...*(x-x_{k-1})*(x-x_{k&plus;1})*...(x-x_{n-1})&space;L(x)=\sum_{k=0}^{n-1}y_k*l_k(x)" title="l_k(x)=(x-x_0)*...*(x-x_{k-1})*(x-x_{k+1})*...(x-x_{n-1}) L(x)=\sum_{k=0}^{n-1}y_k*l_k(x)" />
+l_k(x)=\frac{(x-x_0)*...*(x-x_{k-1})*(x-x_{k+1})*...(x-x_{n-1})}{(x_k-x_0)*...*(x_k-x_{k-1})*(x_k-x_{k+1})*...(x_k-x_{n-1})}\\
+L(x)=\sum_{k=0}^{n-1}y_k*l_k(x)
 
 给四边形边长abcd求面积,s=(a+b+c+d)/2,面积等于sqrt((s-a)*(s-b)*(s-c)*(s-d)-a*b*c*d*cos((e+f)/2)),ef是对角,最大面积是sqrt((s-a)*(s-b)*(s-c)*(s-d))
 
