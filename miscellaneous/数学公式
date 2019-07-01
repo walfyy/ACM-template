@@ -19,4 +19,5 @@ gcd(2^{f_x}-1,2^{f_y}-1)=2^{gcd(f_x,f_y)}-1=2^{f_gcd(x,y)}-1,f是斐波那契数
 
 费马平方和定理:奇素数能表示为两个平方数之和的充分必要条件是该素数被4除余1
 
-范德蒙恒等式:c(n+m,k)=sum_{i=1}^kc(n,i)*c(m,k-i)
+范德蒙恒等式:$c(n+m,k)=sum_{i=1}^kc(n,i)*c(m,k-i)$
+<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
