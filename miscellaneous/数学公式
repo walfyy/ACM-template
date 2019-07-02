@@ -1,24 +1,28 @@
 简单多面体的顶点数V、棱数E及面数F间有关系有著名的欧拉公式：V-E+F=2
 
-海伦公式:三角形三边长a,b,c,面积S=sqrt(p(p-a)(p-b)(p-c)),p=(a+b+c)/2
+海伦公式:三角形三边长a,b,c,面积$S=sqrt(p(p-a)(p-b)(p-c)),p=(a+b+c)/2$
 
-佩尔方程:x^2-d*y^2=1,d是一个固定的正整数且d不是完全平方数
+佩尔方程:$x^2-d*y^2=$1,d是一个固定的正整数且d不是完全平方数
 佩尔方程总有正整数解，若(x1,y1)是使x1最小的解，则每个解(xk,yk)都可以通过取幂得到： 
-xk + yk*sqrt(D) = (x1 + y1*sqrt(D))k 
-也有：xn+1 = x0xn + Dy0yn, yn+1 = y0xn + x0yn; 
-xn+2 = 2x0xn+1-xn,yn+2 = 2x0yn+1-yn.
+$xk + yk*sqrt(D) = (x1 + y1*sqrt(D))k $
+也有：$x_{n+1} = x_0x_n + Dy_0y_n, y_{n+1} = y_0x_n + x_0y_n; $
+$x_{n+2} = 2x_0x_n+1-x_n,y_{n+2} = 2x_0y_n+1-y_n.$
 
-\sum_{i=1}^mC(n,i)=2*\sum_{i=1}^mC(n-1,i)+C(n-1,m)
+$\sum_{i=1}^mC(n,i)=2*\sum_{i=1}^mC(n-1,i)+C(n-1,m)$
 
-gcd(2^{f_x}-1,2^{f_y}-1)=2^{gcd(f_x,f_y)}-1=2^{f_gcd(x,y)}-1,f是斐波那契数列
+$gcd(2^{f_x}-1,2^{f_y}-1)=2^{gcd(f_x,f_y)}-1=2^{f_gcd(x,y)}-1$,f是斐波那契数列
 
 拉格朗日差值:n个点插值
-l_k(x)=\frac{(x-x_0)*...*(x-x_{k-1})*(x-x_{k+1})*...(x-x_{n-1})}{(x_k-x_0)*...*(x_k-x_{k-1})*(x_k-x_{k+1})*...(x_k-x_{n-1})}\\
-L(x)=\sum_{k=0}^{n-1}y_k*l_k(x)
+$l_k(x)=\frac{(x-x_0)*...*(x-x_{k-1})*(x-x_{k+1})*...(x-x_{n-1})}{(x_k-x_0)*...*(x_k-x_{k-1})*(x_k-x_{k+1})*...(x_k-x_{n-1})}\\$
+$L(x)=\sum_{k=0}^{n-1}y_k*l_k(x)$
 
-给四边形边长abcd求面积,s=(a+b+c+d)/2,面积等于sqrt((s-a)*(s-b)*(s-c)*(s-d)-a*b*c*d*cos((e+f)/2)),ef是对角,最大面积是sqrt((s-a)*(s-b)*(s-c)*(s-d))
+给四边形边长abcd求面积,$s=\frac{a+b+c+d}{2}$,面积等于$\sqrt{(s-a)*(s-b)*(s-c)*(s-d)-a*b*c*d*cos(\frac{e+f}{2})}$,ef是对角,最大面积是$\sqrt{(s-a)*(s-b)*(s-c)*(s-d)}$
 
 费马平方和定理:奇素数能表示为两个平方数之和的充分必要条件是该素数被4除余1
 
-范德蒙恒等式:$c(n+m,k)=sum_{i=1}^kc(n,i)*c(m,k-i)$
-<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"> </script>
+范德蒙恒等式:$c(n+m,k)=\sum_{i=1}^kc(n,i)*c(m,k-i)$
+
+f是斐波那契数列,a,b满足$a_i=a_{i-1}+a_{i-2},b_i=b_{i-1}+b_{i-2}$
+$1.c_i=a_i+b_i,c_i=c_{i-1}+c_{i-2}$
+$2.a_n=f_{n-2}a_1+f_{n-1}a_2$
+$3.\sum_{i=1}^na_i=a_{n+2}-a_2$
