@@ -1,5 +1,5 @@
 求解a*x+b*y=c，r=gcd(a,b),当c%r==0时有解，用exgcd求出a*x+b*y=gcd(a,b)的解，
-然后x*c/gcd(a,b)就是其中一个解，最后求最小正整数解，就是(x%b+b)%b,要求y的话，对应求解即可
+然后x*c/gcd(a,b)就是其中一个解，最后求最小正整数解，t=b/gcd(a,b)就是(x%t+t)%t,要求y的话，对应求解即可
 ll exgcd(ll a,ll b,ll &x,ll &y)
 {
     if(!b){x=1,y=0;return a;}
