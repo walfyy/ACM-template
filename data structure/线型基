@@ -34,3 +34,43 @@ struct DSU {
         return query(x);
     }
 };
+
+struct lb {
+    ll r[32];
+    lb() {for (int i=0;i<=31;i++) r[i] = 0;}
+    bool update(ll x) {
+        for (int i=31;i>=0;i--) if ((x >> i) & 1) {
+            if (r[i] == 0) { r[i] = x; return true; }
+            else x ^= r[i];
+        }
+        return false;
+    }
+    bool query(ll x) {
+        for (int i=31;i>=0;i--) if ((x >> i) & 1) {
+            if (r[i] == 0) return false;
+            x ^= r[i];
+        }
+        return true;
+    }
+    lb Merge(lb a,lb b) {
+        lb all,d,ret;
+        for (int i=31;i>=0;i--) {
+            all.r[i] = a.r[i];
+            d.r[i] = 1 << i;
+        }
+        for (int i=31;i>=0;i--) if (b.r[i]) {
+            ll v = b.r[i],k = 0;
+            bool flag = true;
+            for (int j=31;j>=0;j--) if ((v >> j) & 1) {
+                if (all.r[j]) { v ^= all.r[j]; k ^= d.r[j];}
+                else { flag = false; all.r[j] = v; d.r[j] = k; break; }
+            }
+            if (flag) {
+                ll tmp = 0;
+                for (int j=31;j>=0;j--) if ((k >> j) & 1) tmp ^= a.r[j];
+                ret.update(tmp);
+            }
+        }
+        return ret;
+    }
+};
