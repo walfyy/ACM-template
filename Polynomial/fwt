@@ -1,5 +1,5 @@
 #define mod 1000000007
-int inv=qp(2,mod-2);
+int inv2=qp(2,mod-2);
 void fwt_or(int *a,int n,int dft)
 {
     for(int i=1;i<n;i<<=1)
@@ -28,7 +28,7 @@ void fwt_xor(int *a,int n,int dft)
             {
                 int x=a[k],y=a[i+k];
                 a[k]=(x+y)%mod;a[i+k]=(x-y+mod)%mod;
-                if(dft==-1)a[k]=a[k]*inv2%mod,a[i+k]=a[i+k]*inv2%mod;
+                if(dft==-1)a[k]=1ll*a[k]*inv2%mod,a[i+k]=1ll*a[i+k]*inv2%mod;
             }
 }
 //c[k]=Σ(i^j==k)a[i]*b[j];
