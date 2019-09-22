@@ -38,3 +38,21 @@ int main()
     }
     return 0;
 }
+
+void manacher(char *s, int n, int *p) {
+    s[0] = '-', s[n + 1] = '+';
+    int mx = 0, id = 0;
+    for(int i = 1; i <= n; i++) {
+        if(mx > i) p[i] = min(mx - i, p[2 * id - i]);
+        else p[i] = 1;
+        while(s[i + p[i]] == s[i - p[i]]) p[i]++;
+        if(i + p[i] > mx) mx = i + p[i], id = i;
+    }
+    mx = 0, id = 0;
+    for(int i = 1; i <= n; i++) {
+        if(mx > i) p[i] = min(mx - i, p[2 * id - i]);
+        else p[i] = 0;
+        while(s[i + p[i] + 1] == s[i - p[i]]) p[i]++;
+        if(i + p[i] > mx) mx = i + p[i], id = i;
+    }
+}
