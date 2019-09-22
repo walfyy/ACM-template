@@ -34,7 +34,7 @@ struct DSU {
         return query(x);
     }
 };
-
+//线型基求交
 struct lb {
     ll r[32];
     lb() {for (int i=0;i<=31;i++) r[i] = 0;}
