@@ -150,65 +150,45 @@ char s[N];
 //带删除的ac自动机，建两颗ac自动机即可，一颗表示删除
 
 struct Ac {
-    int val[N], ch[N][26], f[N], last[N], cnt, SZ;
-    void init(int SZ = 26) {
-        cnt = 0; this->SZ = SZ;
-        for(int c = 0; c < SZ; c++) ch[0][c] = 0;
+    // 1. init before use 
+    // 2. check character set
+    // 3. use build
+    int ch[N][26], f[N], tot, sz, subVal;
+    int val[N];
+    inline int newNode() {
+        tot++; f[tot] = 0;
+        memset(ch[tot], 0, sizeof(ch[tot]));
+        return tot;
     }
-    int getId(char c) {
-        return c - 'a';
+    void init(int _sz, int _subVal) {
+        sz = _sz; subVal = _subVal;
+        tot = -1; newNode();
     }
-    int newNode() {
-        cnt++;
-        memset(ch[cnt], 0, sizeof(ch[cnt]));
-        val[cnt] = f[cnt] = last[cnt] = 0;
-        return cnt;
-    }
-    void add(char *s) {
+    inline int idx(int c) {return c - subVal;}
+    void addStr(char* s) {
         int u = 0;
         for(int i = 0; s[i]; i++) {
-            int c = getId(s[i]);
+            int c = idx(s[i]);
             if(!ch[u][c]) ch[u][c] = newNode();
             u = ch[u][c];
         }
-        val[u]++;
+        val[u] += 1;
     }
     void build() {
         queue<int> que;
-        f[0] = 0;
-        for(int c = 0; c < SZ; c++) {
-            if(!ch[0][c]) continue;
-            f[ch[0][c]] = last[ch[0][c]] = 0;
-            que.push(ch[0][c]);
+        for(int c = 0; c < sz; c++) {
+            int v = ch[0][c];
+            if(!v) ch[0][c] = 0;
+            else f[v] = 0, que.push(v);
         }
         while(!que.empty()) {
             int u = que.front(); que.pop();
-            for(int c = 0; c < SZ; c++) {
+            val[u] += val[f[u]];
+            for(int c = 0; c < sz; c++) {
                 int v = ch[u][c];
-                if(!v) {
-                    ch[u][c] = ch[f[u]][c];
-                    continue;
-                } else {
-                    que.push(v);
-                    f[v] = ch[f[u]][c];
-                    last[v] = val[f[v]] ? f[v] : last[f[v]];
-                }
+                if(!v) ch[u][c] = ch[f[u]][c];
+                else f[v] = ch[f[u]][c], que.push(v);
             }
         }
     }
-    LL cal(char *s) {
-        LL ans = 0;
-        for(int i = 0, j; s[i]; i++) {
-            int c = getId(s[i]);
-            j = ch[j][c];
-            int p = j;
-            while(p && val[p] != -1) {
-                ans += val[p];
-                val[p] = -1;
-                p = last[p];
-            }
-        }
-        return ans;
-    }
-};
-
+}
