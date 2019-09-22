@@ -1,42 +1,18 @@
-#include <bits/stdc++.h>
-#include <ext/pb_ds/tree_policy.hpp>
-#include <ext/pb_ds/assoc_container.hpp>
-using namespace std;
+#include <bits/extc++.h>
 using namespace __gnu_pbds;
-struct pt{
-    int first,second;
-    pt(int x,int y) :first(x),second(y) {}
-    bool operator<(const pt h)const{
-        return first<h.first || (first==h.first&&second<h.second);
-    }
-    bool operator==(const pt h)const{
-        return first==h.first&&second==h.second;
-    }
-};
-typedef tree<pt,null_mapped_type,less< pt >,rb_tree_tag,tree_order_statistics_node_update> rbtree;
 
-map<int,int>s;
-rbtree t;
+template <class T>
+using Tree = tree<T, null_type, std::less<T>, rb_tree_tag,tree_order_statistics_node_update>;
+
+Tree<int>t;
+//set
 int main()
 {
-    int T;scanf("%d",&T);
-    while(T--)
-    {
-        int op,x;scanf("%d%d",&op,&x);
-        if(op==1)t.insert(pt(x,s[x]++));
-        else if(op==2)t.erase(pt(x,--s[x]));
-        else if(op==3)printf("%d\n",t.order_of_key(pt(x,0))+1);
-        else if(op==4)printf("%d\n",t.find_by_order(x-1)->first);
-        else if(op==5)printf("%d\n",t.find_by_order(t.order_of_key(pt(x,0))-1)->first);
-        else if(op==6)printf("%d\n",t.find_by_order(t.order_of_key(pt(x,s[x]-1))+(t.find(pt(x,0))==t.end()?0:1))->first);
-    }
+    t.insert(1);
+    t.insert(3);
+    t.insert(6);
+    printf("%d\n",t.order_of_key(3));//小于x的有多少个
+    printf("%d\n",*t.find_by_order(2));//排名为x的数是谁(x从0开始)
+    t.erase(3);
     return 0;
 }
-/*******
-1. 插入x数
-2. 删除x数(若有多个相同的数，因只删除一个)
-3. 查询x数的排名(若有多个相同的数，因输出最小的排名)
-4. 查询排名为x的数
-5. 求x的前驱(前驱定义为小于x，且最大的数)
-6. 求x的后继(后继定义为大于x，且最小的数)
-*******/
