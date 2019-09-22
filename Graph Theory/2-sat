@@ -1,0 +1,49 @@
+namespace TwoSat {
+    const int N = 2007;
+    int dfn[N << 1], low[N << 1], belong[N << 1], idx;
+    int in[N << 1], ou[N << 1], stk[N << 1], top;
+    int ans[N], scc_cnt, sign, n;
+    vector<int> G[N << 1];
+    void init(int _n) {
+        n = _n;
+        for(int i = 0; i <= n * 2 + 1; i++) {
+            belong[i] = dfn[i] = low[i] = 0;
+            stk[i] = in[i] = ou[i] = 0;
+            G[i].clear();
+        }
+        scc_cnt = idx = top = sign = 0;
+    }
+    void addEdge(int u, int v) {
+        G[u].push_back(v);
+    }
+    void tarjan(int u) {
+        stk[++top] = u; in[u] = 1;
+        dfn[u] = ++idx; low[u] = idx;
+        for(auto &v : G[u]) {
+            if(dfn[v] == 0) {
+                tarjan(v);
+                low[u] = min(low[u], low[v]);
+            }
+            else if(in[v]) {
+                low[u] = min(low[u], dfn[v]);
+            }
+        }
+        if(dfn[u] == low[u]) {
+            scc_cnt++;
+            while(1) {
+                int v = stk[top--];
+                belong[v] = scc_cnt;
+                in[v] = 0;
+                ou[v] = ++sign;
+                if(v == u) break;
+            }
+        }
+    }
+    // if ans == 0, choose i, else choose i + n
+    int solve() {
+        for(int i = 1; i <= n * 2; i++) if(!dfn[i]) tarjan(i);
+        for(int i = 1; i <= n; i++) if(belong[i] == belong[i + n]) return 0;
+        for(int i = 1; i <= n; i++) ans[i] = ou[i] > ou[i + n];
+        return 1;
+    }
+}
