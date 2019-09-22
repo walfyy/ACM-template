@@ -66,3 +66,10 @@ void cdq(int l,int r)//分治fft
     cdq(m+1,r);
 }
 //分治fft求dp[n]=Σdp[i]*a[n-i]+a[n]
+第一类斯特林数:1-n的排列中有m个轮换的方案数.
+$S(n,*)$的生成函数即$\prod_{i=0}^{n-1}(x+i)$,即x的n次上升幂.
+$F_n(x)=\prod_{i=0}^{n-1}(x+i)$,$F_n(x+n)=\prod_{i=0}^{n-1}(x+n+i)$
+$F_{2n}(x)=F_n(x)*F_n(x+n)$
+$F_n(x)=\sum_{i=0}^{n-1}a_ix^i$,$F_n(x+n)=\sum_{i=0}^{n-1}x^i*\sum_{j=i}^{n-1}\frac{j!}{i!*(j-i)!}n^{j-i}a_j$
+先卷积出$F_n(x+n)$,然后卷积出$F_{2n}(x)$,当n不能整除2时,单独考虑乘(x+n-1).
+递归处理,复杂度$O(nlogn)$
