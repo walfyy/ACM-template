@@ -1,0 +1,26 @@
+struct HashTable {
+    static const int N = (int)1e6 + 7;
+    static const int M = (int)1e6 + 7;
+    int head[N], tot;
+    struct Node {
+        int fval, sval, nex;
+    } a[N];
+    void init() {
+        memset(head, -1, sizeof(head));
+        tot = 0;
+    }
+    void insert(int fval, int sval) {
+        int p = fval % N;
+        a[tot].fval = fval;
+        a[tot].sval = sval;
+        a[tot].nex = head[p];
+        head[p] = tot++;
+    }
+    int find(int fval) {
+        int p = fval % N;
+        for(int i = head[p]; ~i; i = a[i].nex) {
+            if(a[i].fval == fval) return a[i].sval;
+        }
+        return -1;
+    }
+};
