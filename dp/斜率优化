@@ -25,3 +25,75 @@ int main()
     printf("%lld\n",dp[n]);
     return 0;
 }
+
+
+namespace LC {
+/**
+ * Description: Container where you can add lines of the form kx+m, and query maximum values at points x.
+ * LineContainer Time: O(log N)
+ * LinearLineContainer: the k of Line must be no decrease.
+ */
+struct Line {
+    mutable LL k, m, p;
+    bool operator < (const Line& o) const { return k < o.k; }
+    bool operator < (LL x) const { return p < x; }
+};
+struct LineContainer : multiset<Line, less<>> {
+    // (for doubles, use inf = 1/.0, div(a,b) = a/b)
+    const LL inf = LLONG_MAX;
+    LL div(LL a, LL b) { // floored division
+        return a / b - ((a ^ b) < 0 && a % b);
+    }
+    bool isect(iterator x, iterator y) {
+        if (y == end()) { x->p = inf; return false; }
+        if (x->k == y->k) x->p = x->m > y->m ? inf : -inf;
+        else x->p = div(y->m - x->m, x->k - y->k);
+        return x->p >= y->p;
+    }
+    void add(LL k, LL m) {
+        auto z = insert({k, m, 0}), y = z++, x = y;
+        while (isect(y, z)) z = erase(z);
+        if (x != begin() && isect(--x, y)) isect(x, y = erase(y));
+        while ((y = x) != begin() && (--x)->p >= y->p)
+            isect(x, erase(y));
+    }
+    LL query(LL x) {
+        assert(!empty());
+        auto l = *lower_bound(x);
+        return l.k * x + l.m;
+    }
+};
+struct LinearLineContainer {
+    // (for doubles, use inf = 1/.0, div(a,b) = a/b)
+    static const LL inf = LLONG_MAX;
+    Line L[N];
+    int be, ed;
+    void init() {
+        be = 1; ed = 0;
+    }
+    LL div(LL a, LL b) { // floored division
+        return a / b - ((a ^ b) < 0 && a % b);
+    }
+    bool isect(Line &x, Line &y) {
+        if(x.k == y.k) x.p = x.m > y.m ? inf : -inf;
+        else x.p = div(y.m - x.m, x.k - y.k);
+        return x.p >= y.p;
+    }
+    void add(LL k, LL m) {
+        Line cur = Line{k, m, inf};
+        if(be <= ed && isect(L[ed], cur)) {
+            L[ed].p = inf;
+            return;
+        }
+        while(be < ed && L[ed - 1].p >= L[ed].p) {
+            isect(L[--ed], cur);
+        }
+        L[++ed] = cur;
+    }
+    LL query(LL x) {
+        assert(be <= ed);
+        while(L[be].p < x) ++be;
+        return L[be].k * x + L[be].m;
+    }
+};
+}
