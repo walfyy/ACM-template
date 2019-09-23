@@ -1,46 +1,29 @@
 //求a^x=b(%p)的x
-map<ll,ll>ma;
-inline ll quick(ll a,ll b,ll p)
+#define ll long long
+
+inline ll qp(ll a,ll b,ll c){ll ans=1;while(b){if(b&1)ans=ans*a%c;a=a*a%c,b>>=1;}return ans;}
+
+ll bsgs(ll a,ll b,ll p)
 {
-    ll ans=1;
-    while(b)
+    if(a%p==0)return -1;
+    map<ll,ll>ma;
+    ll m=ceil(sqrt(p)),now=b%p;
+    ma[now]=0;
+    for(int i=1;i<=m;i++)
     {
-        if(b&1)ans=ans*a%p;
-        a=a*a%p;b>>=1;
+        now=now*a%p;
+        ma[now]=i;
     }
-    return ans;
-}
-int main()
-{
-    ll p,a,b;
-    while(~scanf("%lld%lld%lld",&p,&a,&b))
+    ll ans=-1,t=qp(a,m,p);now=1;
+    for(int i=1;i<=m;i++)
     {
-        if(a%p==0)
+        now=now*t%p;
+        if(ma[now])
         {
-            puts("no solution");
-            continue;
+            ans=i*m-ma[now];
+            break;
         }
-        ma.clear();
-        ll m=ceil(sqrt(p));
-        ll now=b%p;
-        ma[now]=0;
-        for(int i=1;i<=m;i++)
-        {
-            now=(now*a)%p;
-            ma[now]=i;
-        }
-        ll ans=-1,t=quick(a,m,p);now=1;
-        for(int i=1;i<=m;i++)
-        {
-            now=now*t%p;
-            if(ma[now])
-            {
-                ans=i*m-ma[now];
-                break;
-            }
-        }
-        if(ans!=-1)printf("%lld\n",(ans%p+p)%p);
-        else puts("no solution");
     }
-    return 0;
+    if(ans!=-1)return (ans%p+p)%p;
+    else return -1;
 }
