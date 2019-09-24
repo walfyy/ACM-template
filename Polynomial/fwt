@@ -34,3 +34,39 @@ void fwt_xor(int *a,int n,int dft)
 //c[k]=Σ(i^j==k)a[i]*b[j];
 //c[k]=Σ(i|j==k)a[i]*b[j];
 //c[k]=Σ(i&j==k)a[i]*b[j];
+
+子集卷积
+//$c_k=\sum_{i \cup j = k,i\cap j = \emptyset}a_i*b_j$
+#include<bits/stdc++.h>
+#define ll long long
+#define mod 1000000007
+using namespace std;
+
+const int N=(1<<20)+10,inf=0x3f3f3f3f;
+
+int d[20][N],dp[20][N],a[N];
+void fwt_or(int *a,int n,int dft)
+{
+    for(int i=1;i<n;i<<=1)
+        for(int j=0;j<n;j+=i<<1)
+            for(int k=j;k<j+i;k++)
+            {
+                if(dft==1)a[i+k]=(a[i+k]+a[k])%mod;
+                else a[i+k]=(a[i+k]-a[k]+mod)%mod;
+            }
+}
+int main()
+{
+    int n=17;
+    for(int i=0;i<(1<<n);i++)d[__builtin_popcount(i)][i]=a[i];
+    for(int i=0;i<=n;i++)fwt_or(d[i],(1<<n),1);
+    for(int i=0;i<=n;i++)for(int j=0;j<=i;j++)
+    for(int k=0;k<(1<<n);k++)
+    {
+        dp[i][k]+=1ll*d[j][k]*d[i-j][k]%mod;
+        if(dp[i][k]>=mod)dp[i][k]-=mod;
+    }
+    for(int i=0;i<=n;i++)fwt_or(dp[i],(1<<n),-1);
+    for(int i=0;i<(1<<n);i++)a[i]=dp[__builtin_popcount(i)][i];
+    return 0;
+}
