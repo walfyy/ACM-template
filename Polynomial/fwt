@@ -31,9 +31,9 @@ void fwt_xor(int *a,int n,int dft)
                 if(dft==-1)a[k]=1ll*a[k]*inv2%mod,a[i+k]=1ll*a[i+k]*inv2%mod;
             }
 }
-//c[k]=Σ(i^j==k)a[i]*b[j];
-//c[k]=Σ(i|j==k)a[i]*b[j];
-//c[k]=Σ(i&j==k)a[i]*b[j];
+$c_k=\sum_{i \cup j = k}a_i*b_j$
+$c_k=\sum_{i \cap j = k}a_i*b_j$
+$c_k=\sum_{i \oplus j = k}a_i*b_j$
 
 子集卷积
 //$c_k=\sum_{i \cup j = k,i\cap j = \emptyset}a_i*b_j$
