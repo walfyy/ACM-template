@@ -36,3 +36,8 @@ void init()
     }
     for(int i=1;i<N;i++)sum[i]=sum[i-1]+phi[i];
 }
+rsa加密
+$n=p\cdot q,(p,q)互质$
+$ed=1\bmod \phi(n)$
+$c=m^e \bmod n$
+$m=c^d\bmod n$
