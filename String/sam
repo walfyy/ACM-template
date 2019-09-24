@@ -91,3 +91,4 @@ struct SAM{
     }
 }sam;
 //广义sam每次插入新串把cnt置为1
+//trie树上扩展sam,建好trie树后遍历记录父亲节点对应的last开始扩展儿子即可
