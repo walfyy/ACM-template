@@ -1,0 +1,7 @@
+//p为素数
+//C(n,m)%p = C(n%p,m%p)*C(n/p,m/p)%p
+ll lucas(ll n,ll m,ll p)
+{
+    if(!m)return 1;
+    return C(n%p,m%p,p)*lucas(n/p,m/p)%p;
+}
