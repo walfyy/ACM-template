@@ -98,3 +98,86 @@ int main()
     }
     return 0;
 }
+
+//O(sqrt(n)m)Hopcroft-Karp
+#include<bits/stdc++.h>
+using namespace std;
+
+const int N=200+10,inf=0x3f3f3f3f;
+
+struct edge{int x,y,v;}g[N],u[N];
+int n,m,dis,dx[N],dy[N];
+bool used[N],ok[N][N];
+int mx[N],my[N];//mx保存右侧匹配点，my保存左侧匹配点
+bool searchP()//寻找增广路径集
+{
+    queue<int>q;
+    dis=inf;
+    memset(dy,-1,sizeof dy);
+    memset(dx,-1,sizeof dx);
+    for(int i=1;i<=n;i++)
+        if(mx[i]==-1)//将未访问过的左侧点加入队列
+            q.push(i),dx[i]=0;//距离设为0
+    while(!q.empty()){
+        int u=q.front();q.pop();
+        if(dx[u]>dis)break;
+        for(int i=1;i<=m;i++)//取左侧点匹配到右侧
+        {
+            if(ok[u][i]&&dy[i]==-1)//右侧点联通且未访问
+            {
+                dy[i]=dx[u]+1;//i对应距离为u对应距离+1
+                if(my[i]==-1)dis=dy[i];//i无匹配点
+                else
+                {
+                    dx[my[i]]=dy[i]+1;
+                    q.push(my[i]);
+                }
+            }
+        }
+    }
+    return dis!=inf;
+}
+bool dfs(int x)
+{
+    for(int i=1;i<=m;i++)
+    {
+        if(!used[i]&&ok[x][i]&&dy[i]==dx[x]+1)//没有访问过且距上一点为1
+        {
+            used[i]=1;
+            if(my[i]!=-1&&dy[i]==dis)continue;
+            if(my[i]==-1||dfs(my[i]))
+            {
+                my[i]=x;
+                mx[x]=i;
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+int solve()
+{
+    int ans=0;
+    memset(mx,-1,sizeof mx);
+    memset(my,-1,sizeof my);
+    while(searchP()){
+        memset(used,0,sizeof used);
+        for(int i=1;i<=n;i++)
+            if(mx[i]==-1&&dfs(i))
+              ans++;
+    }
+    return ans;
+}
+int main()
+{
+    int T;scanf("%d",&T);
+    while(T--)
+    {
+        scanf("%d",&n);m=n;
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=n;j++)
+                scanf("%d",&ok[i][j]);
+        puts(solve()==n?"Yes":"No");
+    }
+    return 0;
+}
