@@ -28,7 +28,7 @@ dp套dp,动态dp?
 
 吉司机线段树
 
-trie树扩展sam
+~~trie树扩展sam~~
 
 闵可夫斯基和
 
