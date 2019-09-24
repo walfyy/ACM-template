@@ -1,9 +1,8 @@
 char s[N];
-int c[N],a[N];
 struct SAM{
     int last,cnt;
     int ch[N<<1][26],fa[N<<1],l[N<<1],sz[N<<1];
-    int mx[N<<1],tmp[N<<1];
+    int mx[N<<1],tmp[N<<1],a[N<<1],c[N<<1];
     void ins(int c){
       /*if(ch[last][x])//插入的广义sam
         {
