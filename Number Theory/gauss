@@ -27,3 +27,35 @@ void gauss(int n)
         ans[i]=a[i][n+1]/a[i][i];
     }
 }
+//模意义下
+ll a[N][N],ans[N];
+void gauss(int n,int p)
+{
+    int maxi,tmp;
+    for(int i=1;i<=n;i++)
+	{
+		if(!a[i][i])//主元不能为0
+		{
+			maxi=0;
+			for(int j=i+1;j<=n&&!maxi;j++)
+				if(a[j][i]) maxi=j;
+			if(!maxi) continue;//如果一整列都为0，不需要消元
+			for(int j=i;j<=n+1;j++)
+				tmp=a[maxi][j],a[maxi][j]=a[i][j],a[i][j]=tmp;
+		}
+		for(int j=i+1;j<=n;j++)
+		{
+			tmp=a[j][i];
+			if(!tmp) continue;//已经为0，不需要消元
+			for(int k=i;k<=n+1;k++)
+				a[j][k]=((a[j][k]*a[i][i]-a[i][k]*tmp)%p+p)%p;
+		}
+	}
+	for(int i=n;i;i--)
+	{
+		for(int j=i+1;j<=n;j++)
+			a[i][n+1]=((a[i][n+1]-ans[j]*a[i][j])%p+p)%p;
+		ans[i]=a[i][n+1]*qp(a[i][i],p-2,p)%p;
+	}
+//	for(int i=1;i<=n;i++) printf("%lld ",ans[i]);
+}
