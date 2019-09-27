@@ -1,32 +1,18 @@
 //最大流当前弧优化
-struct edge{
-    int to,Next,c;
-}e[maxn];
-int s,t,cnt,head[N],cur[N];
-int n,m;
-void init()
-{
-    cnt=0;
-    memset(head,-1,sizeof head);
-}
+struct edge{int to,Next,c;}e[maxn];
+int s,t,cnt,head[N],cur[N],n,m;
+void init(){cnt=0;memset(head,-1,sizeof head);}
 void add(int u,int v,int c)
 {
-    e[cnt].to=v;
-    e[cnt].c=c;
-    e[cnt].Next=head[u];
-    head[u]=cnt++;
-    e[cnt].to=u;
-    e[cnt].c=0;
-    e[cnt].Next=head[v];
-    head[v]=cnt++;
+    e[cnt].to=v;e[cnt].c=c;e[cnt].Next=head[u];head[u]=cnt++;
+    e[cnt].to=u;e[cnt].c=0;e[cnt].Next=head[v];head[v]=cnt++;
 }
 int dis[N];
 bool bfs()
 {
     queue<int>q;
     memset(dis,-1,sizeof dis);
-    dis[s]=1;
-    q.push(s);
+    dis[s]=1;q.push(s);
     while(!q.empty())
     {
         int x=q.front();q.pop();
@@ -42,14 +28,14 @@ bool bfs()
     }
     return dis[t]!=-1;
 }
-ll dfs(int u,ll mx)
+int dfs(int u,int mx)
 {
     if(u==t)return mx;
-    ll flow=0,f;
+    int flow=0,f;
     for(int &i=cur[u];~i;i=e[i].Next)
     {
         int x=e[i].to;
-        if(dis[x]==dis[u]+1&&e[i].c>0&&(f=dfs(x,min(mx-flow,1ll*e[i].c))))
+        if(dis[x]==dis[u]+1&&e[i].c>0&&(f=dfs(x,min(mx-flow,e[i].c))))
         {
             e[i].c-=f;
             e[i^1].c+=f;
@@ -60,17 +46,16 @@ ll dfs(int u,ll mx)
     if(flow==0)dis[u]=-2;
     return flow;
 }
-ll maxflow()
+int maxflow()
 {
-    ll ans=0,f;
+    int ans=0,f;
     while(bfs())
     {
-        for(int i=0;i<=n;i++)cur[i]=head[i];
+        for(int i=0;i<=t;i++)cur[i]=head[i];
         while((f=dfs(s,inf)))ans+=f;
     }
     return ans;
 }
-
 //费用流
 struct edge{
     int to,Next,c;
