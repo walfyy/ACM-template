@@ -1,0 +1,102 @@
+```
+#include<bits/stdc++.h>
+#define ll long long
+#define mod 1000000007
+
+using namespace std;
+
+const int N=100000+10;
+
+bool mark[N];
+int prime[N],cnt;
+ll g[N],h[N],id[2][N],val[N],sum[N],up,n;
+ll S(ll x,int y)
+{
+    if(x<=1||prime[y]>x)return 0;
+    int k=(x<=up)?id[0][x]:id[1][n/x];
+    ll ret=g[k]-h[k]-sum[y-1]+y-1;
+    for(int i=y;i<=cnt&&1ll*prime[i]*prime[i]<=x;i++)
+    {
+        ll t1=prime[i],t2=1ll*prime[i]*prime[i];
+        for(int j=1;t2<=x;t1=t2,t2*=prime[i],j++)
+            ret+=S(x/t1,i+1)*(t1/prime[i]*(prime[i]-1))+(t2/prime[i]*(prime[i]-1));
+    }
+    return ret;
+}
+ll S1(ll x,int y)
+{
+    if(x<=1||prime[y]>x)return 0;
+    int k=(x<=up)?id[0][x]:id[1][n/x];
+    ll ret=-h[k]+y-1;
+    for(int i=y;i<=cnt&&1ll*prime[i]*prime[i]<=x;i++)
+    {
+        ll t1=prime[i],t2=1ll*prime[i]*prime[i];
+        ret-=S1(x/t1,i+1);
+    }
+    return ret;
+}
+void init()
+{
+    up=sqrt(n);
+    cnt=0;
+    memset(mark,0,sizeof mark);
+    for(int i=2;i<=up;i++)
+    {
+        if(!mark[i])prime[++cnt]=i,sum[cnt]=sum[cnt-1]+i;
+        for(int j=1;j<=cnt&&i*prime[j]<=up;j++)
+        {
+            mark[i*prime[j]]=1;
+            if(i%prime[j]==0)break;
+        }
+    }
+    int m=0;
+    for(ll i=1,j;i<=n;i=j+1)
+    {
+        j=n/(n/i);
+        val[++m]=n/i;
+        g[m]=(n/i)*(n/i+1)/2-1;
+        h[m]=n/i-1;
+        if(n/i<=up)id[0][n/i]=m;
+        else id[1][i]=m;
+    }
+    for(int j=1;j<=cnt;j++)for(int i=1;i<=m&&1ll*prime[j]*prime[j]<=val[i];i++)
+    {
+        ll te=val[i]/prime[j];
+        int k=(te<=up)?id[0][te]:id[1][n/te];
+        g[i]-=1ll*(sum[j]-sum[j-1])*(g[k]-sum[j-1]);
+        h[i]-=h[k]-j+1;
+    }
+}
+int main()
+{
+    int T;scanf("%d",&T);
+    while(T--)
+    {
+        scanf("%lld",&n);
+        if(n==0){puts("0 0");continue;}
+        init();
+        printf("%lld %lld\n",S(n,1)+1,S1(n,1)+1);
+    }
+    return 0;
+}
+/********************
+
+********************/
+```
+
+时间复杂度$O(\frac{n^{\frac{3}{4}}}{log(n)})$,空间$O(\sqrt n)$
+先求解$x=\lfloor \frac{N}{i} \rfloor$,$\sum_{i=1}^x[i&ensp;is&ensp;a&ensp;prime]\cdot i^k$
+线筛$\sqrt n$内的$prime_i$和k次前缀和$sum_i=\sum_{j=1}^iprime_j^k$
+$g(N,i)是N以内的在埃筛进行第i轮后未被筛去的数的k次方和$
+合数X有$\sqrt X$以内的质因数,$g(N,cnt)$即为所求，cnt为$\sqrt N$以内的质数个数
+$prime_i^2>N$
+$g(N,i)=g(N,i-1)$
+$prime_i^2\le N$
+$g(N,i)=g(N,i-1)-prime_i^k\cdot (g(\lfloor \frac{N}{prime_i} \rfloor,i-1)-sum_{i-1})$
+考虑求解$\sum_{i=1}^Nf(i)$
+$S(N,i)是所有满足最小质因子大于等于prime_i的f值之和$
+$\sum_{i=1}^Nf(i)=s(N,1)+f(1)$
+$prime_i>N$
+$S(N,i)=0$
+$prime_i\le N$
+$\sum_{j=1}^N[j&ensp;is&ensp;a&ensp;prime]\cdot f(j)-\sum_{j=1}^{i-1}f(prime_j)+\sum_{j=i}^{prime_j^2\le N}\sum_{k=1}^{prime_{j}^{k+1}\le N}(s(\lfloor \frac{N}{prime_j^k} \rfloor,j+1)\cdot f(prime_j^k)+f(prime_{j}^{k+1}))$
