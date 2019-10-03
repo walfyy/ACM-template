@@ -112,3 +112,16 @@ int main()
     }
     return 0;
 }
+狄利克雷卷积:
+$(f*g)(n)=\sum_{d|n}f(d)\cdot g(\frac{n}{d})$
+$\sum_{i=1}^n(f*g)(i)$
+$=\sum_{i=1}^n\sum_{d|i}f(\frac{n}{d}){\cdot}g(d)$
+$=\sum_{d=1}^ng(d)\sum_{i=1}^{\lfloor \frac{n}{d} \rfloor}f(i)$
+$=\sum_{d=1}g(d){\cdot}S(\lfloor \frac{n}{d} \rfloor)$
+那么有$g(1)\cdot S(n)=\sum_{i=1}^n(f*g)(i)-\sum_{d=2}^ng(d)\cdot S(\lfloor \frac{n}{d} \rfloor)$
+
+让$g=I$(常函数),由于当$f=\mu$时，$\mu*I=e$，那么$S(n)=\sum_{i=1}^n(f*g)(i)-\sum_{d=2}^nS(\lfloor \frac{n}{d} \rfloor)=1-\sum_{d=2}^nS(\lfloor \frac{n}{d} \rfloor)$
+
+当$f=\phi$时，$\phi*I=id$,那么$S(n)=\sum_{i=1}^n(f*g)(i)-\sum_{d=2}^nS(\lfloor \frac{n}{d} \rfloor)=n\cdot (n+1)/2-\sum_{d=2}^nS(\lfloor \frac{n}{d} \rfloor)$
+
+复杂度$O(n^{\frac{2}{3}})$,前$n^{\frac{2}{3}}$预处理，后面的根据分块记忆化递推
