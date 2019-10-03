@@ -1,4 +1,4 @@
-//预处理O(n),单次询问O(sqrt(n))
+```
 bool mark[N];
 int prime[N],cnt,mu[N];
 void init()
@@ -19,16 +19,44 @@ void init()
         }
     }
 }
-[n==1] == $\sum_{d|n}μ(d)
+```
+莫比乌斯反演:
+假设$F(n)=\sum_{d|n}f(d)$,那么$f(n)=\sum_{d|n}μ(d)F(\frac{n}{d})$
+假设$F(n)=\sum_{n|d}f(d)$,那么$f(n)=\sum_{n|d}μ(\frac{d}{n})F(d)$
+假设$f(n)$表示gcd=k的方案数,$F(n)$表示gcd=k的倍数的方案数,那么有$F(n)=\sum_{n|d}f(d)$
+有莫比乌斯反演,$f(n)=\sum_{n|d}μ(\frac{d}{n})F(d)$,再整除分块前缀和
+
+积性函数:
+$[n==1] = \sum_{d|n}μ(d)$
 $I(n)=1$(常函数)
 $\mu(n)$(莫比乌斯函数)
 $\phi(n)$(欧拉函数)
-$\e(n)=[n==1]$(单位函数)
+$e(n)=[n==1]$(单位函数)
 $id(n)=n$
-因为$\sum_{d|n}\mu(d)=[n==1]$,所以$I*\mu=\e$
+$d(n)=(p_1+1)*...*(p_k+1),(n=a_1^{p_1}*...*a_k^{p_k})$约数个数函数
+$D(n)=(1+a_1+...+a_1^{p_1})*...*(1+a_k+...+a_k^{p_k})(n=a_1^{p_1}*...*a_k^{p_k})$约数和函数
+因为$\sum_{d|n}\mu(d)=[n==1]$,所以$I*\mu=e$
 因为$n=\sum_{d|n}\phi(d)$，所以$I*\phi=id$
-\phi=id*\mu
-狄利克雷卷积:$(f*g)(n)=\sum_{d|n}f(d)*g(\frac{n}{d})$
+$\phi=id*\mu$
 
 积性函数倍数和
-$\sum_{i=1}^mf(i*n)=-\sum_{i=1}^mf(i*\frac{n}{d})+\sum_{i=1}^{ \lfloor \frac{m}{d} \rfloor}f(i*n)$
+$\sum_{i=1}^mf(i\cdot n)=-\sum_{i=1}^mf(i{\cdot}\frac{n}{d})+\sum_{i=1}^{ \lfloor \frac{m}{d} \rfloor}f(i\cdot n)$
+欧拉函数性质:所有小于n和n互质的数的和为$\frac{n{\cdot}\phi(n)}{2}$,即$\sum_{i=1}^{n-1}i[(i,n)==1]=\frac{n{\cdot}\phi(n)}{2}$
+
+证明:$gcd(n,i)=1$,那么$gcd(n,n-i)=1$.反证法:假设$gcd(n,n-i)=k$,那么$n-i\%k=0$,$n\%k=0$,则$i\%k=0$,那么$gcd(n,i)=k$,那么这些数成对出现,而且加起来是n
+
+$D(ij)=\sum_{x|i}\sum_{y|j}\frac{x\cdot j}{y}\cdot [(x,y)==1]$
+
+$d(n\cdot m)=\sum_{i|n}\sum_{j|m}[gcd(i,j)==1]$
+
+$d(n^2)=\sum_{d|n}2^{w(d)}=\sum_{d|n}\sum_{i|d}{\mu(i)}^2$
+
+$\sum_{i=1}^n\mu(i)^2=\sum_{i=1}^{\sqrt n}\mu(i){\cdot}{\lfloor \frac{n}{i^2} \rfloor}$
+
+$\sum_{d|n}\mu(d)^2{\cdot}\mu(\frac{n}{d})=\sum_{d=1}^{\sqrt n}\mu(i)$
+
+$\mu(lcm(i,j))=\mu(i){\cdot}\mu(j){\cdot}\mu(gcd(i,j))$
+
+$\sum_{i=1}^n[(i,n)==1]\cdot (i-1,n)=d(n){\cdot}\phi(n)$
+
+ 
