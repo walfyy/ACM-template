@@ -38,12 +38,16 @@ $D(n)=(1+a_1+...+a_1^{p_1})*...*(1+a_k+...+a_k^{p_k})(n=a_1^{p_1}*...*a_k^{p_k})
 因为$\sum_{d|n}\mu(d)=[n==1]$,所以$I*\mu=e$
 因为$n=\sum_{d|n}\phi(d)$，所以$I*\phi=id$
 $\phi=id*\mu$
+$D=id*I$
+$f=D,g=\mu,D*\mu=id*I*\mu=id*e,S(n)=\sum_{i=1}^ni-\sum_{d=2}^n\mu(d)\cdot S(\lfloor \frac{n}{d} \rfloor)$
+$d=I*I$
+$f=d,g=\mu,d*\mu=I*I*\mu=I*e=e,S(n)=\sum_{i=1}^n1-\sum_{d=2}^n\mu(d)\cdot S(\lfloor \frac{n}{d} \rfloor)$
 
 积性函数倍数和
 $\sum_{i=1}^mf(i\cdot n)=-\sum_{i=1}^mf(i{\cdot}\frac{n}{d})+\sum_{i=1}^{ \lfloor \frac{m}{d} \rfloor}f(i\cdot n)$
 欧拉函数性质:所有小于n和n互质的数的和为$\frac{n{\cdot}\phi(n)}{2}$,即$\sum_{i=1}^{n-1}i[(i,n)==1]=\frac{n{\cdot}\phi(n)}{2}$
 
-证明:$gcd(n,i)=1$,那么$gcd(n,n-i)=1$.反证法:假设$gcd(n,n-i)=k$,那么$n-i\%k=0$,$n\%k=0$,则$i\%k=0$,那么$gcd(n,i)=k$,那么这些数成对出现,而且加起来是n
+证明:$gcd(n,i)=1$,那么$gcd(n,n-i)=1$.反证法:假设$gcd(n,n-i)=k$,那么$(n-i)\%k=0$,$n\%k=0$,则$i\%k=0$,那么$gcd(n,i)=k$,那么这些数成对出现,而且加起来是n
 
 $D(ij)=\sum_{x|i}\sum_{y|j}\frac{x\cdot j}{y}\cdot [(x,y)==1]$
 
@@ -58,5 +62,3 @@ $\sum_{d|n}\mu(d)^2{\cdot}\mu(\frac{n}{d})=\sum_{d=1}^{\sqrt n}\mu(i)$
 $\mu(lcm(i,j))=\mu(i){\cdot}\mu(j){\cdot}\mu(gcd(i,j))$
 
 $\sum_{i=1}^n[(i,n)==1]\cdot (i-1,n)=d(n){\cdot}\phi(n)$
-
- 
