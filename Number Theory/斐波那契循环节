@@ -1,0 +1,115 @@
+#include<bits/stdc++.h>
+#define fi first
+#define se second
+#define ll long long
+#define mp make_pair
+#define pb push_back
+#define mod 1000000007
+inline ll qp(ll a,ll b){ll ans=1;while(b){if(b&1)ans=ans*a%mod;a=a*a%mod,b>>=1;}return ans;}
+inline ll qp(ll a,ll b,ll c){ll ans=1;while(b){if(b&1)ans=ans*a%c;a=a*a%c,b>>=1;}return ans;}
+
+using namespace std;
+
+const double eps=1e-8;
+const ll INF=0x3f3f3f3f3f3f3f3f;
+const int N=100000+10,maxn=300000+10,inf=0x3f3f3f3f;
+
+struct Node{
+    ll row,col;
+    ll a[3][3];
+};
+Node mul(Node x,Node y,ll c)
+{
+    Node ans;
+    ans.row=x.row,ans.col=y.col;
+    memset(ans.a,0,sizeof ans.a);
+    for(int i=0;i<x.row;i++)
+        for(int j=0;j<x.col;j++)
+           for(int k=0;k<y.col;k++)
+               ans.a[i][k]=(ans.a[i][k]+x.a[i][j]*y.a[j][k]+c)%c;
+    return ans;
+}
+Node quick_mul(Node x,ll n,ll c)
+{
+    Node ans;
+    ans.row=x.row,ans.col=x.col;
+    memset(ans.a,0,sizeof ans.a);
+    for(int i=0;i<ans.col;i++)ans.a[i][i]=1;
+    while(n){
+        if(n&1)ans=mul(ans,x,c);
+        x=mul(x,x,c);
+        n>>=1;
+    }
+    return ans;
+}
+bool ok(ll x,ll n)
+{
+    Node A;A.row=A.col=2;
+    A.a[0][0]=A.a[0][1]=A.a[1][0]=1;A.a[1][1]=0;
+    A=quick_mul(A,x-1,n);
+    return ((A.a[0][0]+A.a[0][1])%n==1)&&((A.a[1][0]+A.a[1][1])%n==0);
+}
+bool erci(ll x,ll p){return qp(x,(p-1)>>1,p)==1;}
+ll n,fac[N],cnt;
+vector<pair<ll,int>>v;
+ll fibmod(ll n)
+{
+    v.clear();
+    for(ll i=2;i*i<=n;i++)
+    {
+        if(n%i==0)
+        {
+            int co=0;
+            while(n%i==0)n/=i,co++;
+            v.pb(mp(i,co));
+        }
+    }
+    if(n!=1)v.pb(mp(n,1));
+    ll ans=1;
+    for(int i=0;i<v.size();i++)
+    {
+        ll p=v[i].fi,m=v[i].se;
+        ll te,gp,x;
+        if(p==2)gp=3;
+        else if(p==3)gp=8;
+        else if(p==5)gp=20;
+        else
+        {
+            if(erci(5,p))te=p-1;
+            else te=2*(p+1);
+            cnt=0;
+            for(ll j=1;j*j<=te;j++)
+            {
+                if(te%j==0)
+                {
+                    fac[++cnt]=j;
+                    if(j*j!=te)fac[++cnt]=te/j;
+                }
+            }
+            sort(fac+1,fac+1+cnt);
+            for(int j=1;j<=cnt;j++)
+            {
+                if(ok(fac[j],p))
+                {
+                    gp=fac[j];
+                    break;
+                }
+            }
+        }
+        x=gp*(ll)pow(p,m-1);
+        ans=ans/__gcd(ans,x)*x;
+    }
+    return ans;
+}
+int main()
+{
+    while(~scanf("%llu",&n))
+    {
+        if(n==2)puts("3");
+        else printf("%llu\n",fibmod(n)>>1ll);
+    }
+    return 0;
+}
+/********************
+
+********************/
