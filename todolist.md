@@ -51,7 +51,13 @@ int main()
    
 且没有其他参数或其他参数都有默认值,那么这个函数是拷贝构造函数.
 
-**移动构造函数**
+## 右值引用，移动语义，完美转发，通用引用
+
+**移动构造函数（移动语义的关键）**
+
+区分左值和右值：能不能取地址！
+
+定义移动构造函数后编译器会默认将右值进行移动构造，可以提升效率（函数传参为类对象，函数返回值为类对象）
 ~~~
 class A{
 private:
@@ -78,6 +84,34 @@ int main()
 }
 ~~~
 右值引用，避免a的拷贝，直接将a给b，同时删除a
+
+**完美转发**
+
+forward保留参数的左右值类型
+~~~
+void f1(int &a)
+{
+    puts("&");
+}
+void f1(int &&a)
+{
+    puts("&&");
+}
+int main()
+{
+    int &&a=1;
+    f1(forward<int>(a));
+    return 0;
+}
+~~~
+
+**通用引用**
+
+1.必须满足T&&这种形式
+
+2.类型T必须是通过推断得到的（函数模板，auto）
+
+即可是左值引用，也可是右值引用
 
 **常量函数**
 
@@ -131,17 +165,59 @@ protected: 只能被类成员函数、子类函数及友元访问，不能被其
 
 使用public继承，父类中的protected和public属性不发生改变
 
-**STL**
+## STL
+
 vector扩容：如果当前位置内存已满，新开更大的内存，**把内容复制过来**，释放之前的内存，然后加入新元素（两倍或者1.5倍）
 
 **为什么要成倍扩容，而不是增长固定容量**
+
 二倍扩容时：当插入n个数时，大约需要log2(n)次扩容，每次需要复制2^i个元素，一共需要复制2^1+...+2^{log2(n)}=2(n-1),平均每次pushback需要2(n-1)/n,约O(1)复杂度
+
 固定容量为k时：当插入n个数，需n/k次扩容，每次ki个元素，一共复制k+2k+...+n/k * k=(1+n/k)* n,当k为2时，复杂度O(n^2),均摊为O(n)
 
-**为什么是两倍**
+**为什么是两倍或者1.5倍，不是3，4倍**
+
+如果以大于2倍的方式扩容，下一次申请的内存会大于之前分配内存的总和，导致之前分配的内存不能再被使用。
+
+**vector vs list效率**
+
+插入时，vector比list快，遍历时差不多
+
+**memcpy源码**
+
+memcpy内未解决内存覆盖问题，下面是优化过的
+
+~~~
+void *memcpy(void *dst,const void *src,size_t len)
+{
+    if(dst==NULL||src==NULL)return NULL;
+    void *ret=dst;
+    if(dst<=src||(char*)dst>=(char*)src+len)
+    {
+        while(len--)
+        {
+            *(char*)dst=*(char*)src;
+            dst=(char*)dst+1;
+            src=(char*)src+1;
+        }
+    }
+    else
+    {
+        src=(char*)src+len-1;
+        dst=(char*)dst+len-1;
+        while(len--)
+        {
+            *(char*)dst=*(char*)src;
+            dst=(char*)dst-1;
+            src=(char*)src-1;
+        }
+    }
+}
+~~~
 
 
-**计网：**
+
+# 计网
 
 rtt：报文往返时间
 
