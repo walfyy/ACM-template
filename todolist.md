@@ -167,6 +167,36 @@ sizeof数组：数组内存大小* 数据bit大小
 
 inline是在编译器将函数内容替换到函数调用处，是静态编译的。而虚函数是动态调用的，在编译器并不知道需要调用的是父类还是子类的虚函数，所以不能够inline声明展开，所以编译器会忽略
 
+**虚继承**
+
+虚继承是用来解决菱形继承的问题，对于D中和B，C相同的变量，还是要通过域限定来确定。
+~~~
+class A{
+public:
+    int a;
+    void f(){puts("!!");}
+};
+class B:virtual public A{
+public:
+    int a;
+};
+class C:virtual public A{
+public:
+    int a;
+};
+class D:public B,public C{
+
+};
+int main()
+{
+    D d;
+    d.f();
+    d.A::f();
+    d.C::f();
+    return 0;
+}
+~~~
+
 
 **程序编译的四个阶段：**
 
@@ -283,6 +313,50 @@ void *memcpy(void *dst,const void *src,size_t len)
 }
 ~~~
 
+**share_ptr简单实现**
+~~~
+template<typename T>
+class Shared_ptr{
+public:
+    Shared_ptr():count(new int(1)),val(new T()){}
+    Shared_ptr(T *p):count(new int(1)),val(p){}
+    Shared_ptr(const Shared_ptr&p):count(p.count),val(p.val){
+        ++*count;
+    }
+    ~Shared_ptr(){
+        del();
+    }
+    T& operator *(){
+        return *val;
+    }
+    Shared_ptr& operator =(const Shared_ptr&p){
+        ++*p.count;
+        del();
+        count=p.count;
+        val=p.val;
+        return *this;
+    }
+    void del(){
+        if(--*count==0)
+        {
+            delete count;
+            delete val;
+        }
+    }
+    int use_count(){return *count;}
+private:
+    int *count;
+    T *val;
+};
+int main()
+{
+    Shared_ptr<int>a;
+    printf("%d\n",a.use_count());
+    Shared_ptr<int>b=a;
+    printf("%d %d\n",a.use_count(),b.use_count());
+    return 0;
+}
+~~~
 
 
 # 计网
