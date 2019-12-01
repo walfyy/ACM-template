@@ -263,6 +263,12 @@ int main()
 
 -std：指定C标准，如-std=c99使用c99标准，-std=gnu99，使用C99 再加上 GNU 的一些扩展。
 
+**main前调用函数**
+
+main前调用：__attribute((constructor))
+
+main后调用：__attribute((destructor))
+
 **C++异常处理**
 
 https://www.runoob.com/cplusplus/cpp-exceptions-handling.html
